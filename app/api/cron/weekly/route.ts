@@ -1,4 +1,5 @@
 import { loadConfig } from "@/config";
+import { allowsLocalForceRun } from "@/core/cron";
 import { formatActive } from "@/core/format";
 import { createNotionStore } from "@/integrations/notionStore";
 import { createTelegramClient } from "@/integrations/telegramClient";
@@ -8,7 +9,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const config = loadConfig();
   const auth = request.headers.get("authorization");
-  const force = new URL(request.url).searchParams.get("force") === "1";
+  const force = allowsLocalForceRun(request);
 
   if (auth !== `Bearer ${config.cronSecret}` && !force) {
     return new Response("Unauthorized", { status: 401 });

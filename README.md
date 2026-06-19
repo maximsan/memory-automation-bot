@@ -31,12 +31,14 @@ npm run build
 1. Create a Notion page named `Project Memory Bot`.
 2. Share it with your Notion integration.
 3. Copy `.env.example` to `.env.local` and fill the values.
-4. Optionally copy `config/projects.example.json` to `config/projects.json`.
+4. Optionally copy `config/projects.example.json` to `config/projects.json` if you want setup to seed initial project rows. You can also skip this and add projects later with `/addproject`.
 5. Run:
 
 ```bash
 npm run setup:notion
 ```
+
+The setup script loads `.env.local` automatically.
 
 Deploy to Vercel, then set the Telegram webhook to:
 

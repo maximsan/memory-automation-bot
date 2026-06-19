@@ -240,8 +240,8 @@
       <li>Send a message to your bot, then run <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates"</code> before a webhook is set. Use the numeric <code>message.from.id</code> for <code>TELEGRAM_ALLOWED_USER_IDS</code>.</li>
       <li>Create a Notion internal integration, create a parent page named <code>Project Memory Bot</code>, share the page with the integration, and set <code>NOTION_TOKEN</code> plus <code>NOTION_PARENT_PAGE_ID</code>.</li>
       <li>Add <code>OPENAI_API_KEY</code> and <code>CRON_SECRET</code>.</li>
-      <li>Optional: copy <code>config/projects.example.json</code> to <code>config/projects.json</code>.</li>
-      <li>Run <code>npm run setup:notion</code> to create or reuse the Notion databases.</li>
+      <li>Optional seed only: copy <code>config/projects.example.json</code> to <code>config/projects.json</code> if you want setup to create your first project rows. Otherwise, add projects later with <code>/addproject</code>.</li>
+      <li>Run <code>npm run setup:notion</code> to create or reuse the Notion databases. The script loads <code>.env.local</code> automatically.</li>
       <li>Deploy to Vercel and copy the production URL.</li>
       <li>Set the Telegram webhook: <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://YOUR_PROJECT.vercel.app/api/telegram/webhook"</code>.</li>
     </ol>
