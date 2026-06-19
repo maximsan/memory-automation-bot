@@ -1,0 +1,17 @@
+{
+  "timezone": "Europe/Warsaw",
+  "weeklyReminder": {
+    "day": 1,
+    "hour": 9
+  },
+  "limits": {
+    "maxTextChars": 8000,
+    "maxVoiceSeconds": 300,
+    "dailyCaptureSoftLimit": 50,
+    "dailyCaptureHardLimit": 100
+  },
+  "projectView": {
+    "recentNotes": 3,
+    "maxTasks": 5
+  }
+}

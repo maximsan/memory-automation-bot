@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/weekly",
+      "schedule": "0 * * * 1"
+    }
+  ],
+  "functions": {
+    "app/api/queues/process-capture/route.ts": {
+      "experimentalTriggers": [
+        {
+          "type": "queue/v2beta",
+          "topic": "capture-processing"
+        }
+      ]
+    }
+  }
+}
