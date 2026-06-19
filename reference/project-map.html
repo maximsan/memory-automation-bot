@@ -190,6 +190,10 @@
         <td>Weekly reminder</td>
         <td><code>app/api/cron/weekly/route.ts</code>, <code>vercel.json</code>, and <code>config/bot.json</code>.</td>
       </tr>
+      <tr>
+        <td>Checks or deployment flow</td>
+        <td><code>.github/workflows/checks.yml</code> for GitHub checks, and <code>docs/ci-cd.md</code> for the Vercel Git deployment model.</td>
+      </tr>
     </table>
 
     <h2>Local Checks</h2>
@@ -201,7 +205,7 @@
     </ol>
 
     <h2>Deployment Boundary</h2>
-    <p>Use local runs for tests and setup scripts. Use Vercel deployment for the real Telegram webhook and queue consumer. Telegram requires a public HTTPS webhook URL, and Vercel Queue is the async runtime for capture processing.</p>
+    <p>GitHub Actions repeats the local checks. Vercel Git integration owns deployments. Use the onboarding lesson for the concrete setup and verification path.</p>
 
     <h2>External State</h2>
     <ul>

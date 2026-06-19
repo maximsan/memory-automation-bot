@@ -9,13 +9,22 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const config = loadConfig();
   const auth = request.headers.get("authorization");
+
+  // `?force=1` is a local development escape hatch for manually testing the
+  // weekly reminder route without waiting for Monday 09:00 or sending the
+  // Vercel Cron bearer token. `allowsLocalForceRun` keeps this unavailable on
+  // Vercel and on non-local hosts, so production still requires cron auth and
+  // the configured reminder hour.
   const force = allowsLocalForceRun(request);
 
-  if (auth !== `Bearer ${config.cronSecret}` && !force) {
+  if (!force && auth !== `Bearer ${config.cronSecret}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  if (!force && !isConfiguredReminderHour(config.timezone, config.weeklyReminderHour)) {
+  if (
+    !force &&
+    !isConfiguredReminderHour(config.timezone, config.weeklyReminderHour)
+  ) {
     return Response.json({ skipped: true });
   }
 
@@ -23,10 +32,13 @@ export async function GET(request: Request) {
   const counts = await notion.activeCounts();
   const telegram = createTelegramClient(config.telegramBotToken);
   const [chatId] = config.allowedTelegramUserIds;
+
   await telegram.sendMessage({
     chatId,
-    text: ["*Weekly check-in:*", formatActive(counts), "", "Use /active"].join("\n"),
-    markdown: true
+    text: ["*Weekly check-in:*", formatActive(counts), "", "Use /active"].join(
+      "\n",
+    ),
+    markdown: true,
   });
 
   return Response.json({ ok: true });
@@ -37,7 +49,7 @@ function isConfiguredReminderHour(timezone: string, hour: number): boolean {
     timeZone: timezone,
     weekday: "short",
     hour: "numeric",
-    hourCycle: "h23"
+    hourCycle: "h23",
   }).formatToParts(new Date());
   const weekday = parts.find((part) => part.type === "weekday")?.value;
   const currentHour = Number(parts.find((part) => part.type === "hour")?.value);

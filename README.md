@@ -13,14 +13,17 @@ The first implementation is intentionally small:
 
 ## Docs
 
+- [Project onboarding lesson](lessons/0001-project-onboarding.html)
 - [Product spec](docs/product-spec.md)
 - [Version A: Vercel](docs/version-a-vercel.md)
 - [Version B: n8n](docs/version-b-n8n.md)
+- [CI/CD](docs/ci-cd.md)
 
 ## Local Commands
 
 ```bash
 npm install
+npm run lint
 npm run typecheck
 npm test
 npm run build
@@ -28,20 +31,4 @@ npm run build
 
 ## Setup
 
-1. Create a Notion page named `Project Memory Bot`.
-2. Share it with your Notion integration.
-3. Copy `.env.example` to `.env.local` and fill the values.
-4. Optionally copy `config/projects.example.json` to `config/projects.json` if you want setup to seed initial project rows. You can also skip this and add projects later with `/addproject`.
-5. Run:
-
-```bash
-npm run setup:notion
-```
-
-The setup script loads `.env.local` automatically.
-
-Deploy to Vercel, then set the Telegram webhook to:
-
-```text
-https://<your-project>.vercel.app/api/telegram/webhook
-```
+Use [Project onboarding lesson](lessons/0001-project-onboarding.html) for the full Telegram, Notion, OpenAI, Vercel, GitHub, and webhook setup path.

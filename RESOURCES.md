@@ -8,8 +8,12 @@
   The source of truth for the current code architecture and runtime boundaries. Use before changing routes, queue flow, or deployment setup.
 - [Version B: n8n implementation design](docs/version-b-n8n.md)
   The future shareable/non-technical version. Use only when checking whether Version A changes preserve the shared product contract.
+- [Checks and Deployment](docs/ci-cd.md)
+  The source of truth for the simplified CI/deployment split: GitHub checks only, Vercel Git deploys preview and production.
 - [Next.js route handlers](https://nextjs.org/docs/app/api-reference/file-conventions/route)
   Official reference for `app/api/**/route.ts` files and Web `Request` / `Response` handlers.
+- [Vercel Git deployments](https://vercel.com/docs/git)
+  Official reference for preview and production deployments created from Git branches and pull requests.
 - [Vercel Queues](https://vercel.com/docs/queues)
   Official reference for queue durability, producer/consumer behavior, retries, and observability.
 - [Vercel Cron Jobs](https://vercel.com/docs/cron-jobs)

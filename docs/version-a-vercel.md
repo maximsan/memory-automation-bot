@@ -66,23 +66,20 @@ Optional seed projects:
 
 - `config/projects.json`
 
-## Setup
+## Setup Script
 
-1. Create a Notion parent page named `Project Memory Bot`.
-2. Share that page with the Notion integration.
-3. Set `NOTION_PARENT_PAGE_ID`.
-4. Fill Vercel env vars.
-5. Optionally create `config/projects.json` from `config/projects.example.json` to seed initial project rows. You can also skip this and add projects later with `/addproject`.
-6. Run `npm run setup:notion`. The setup script loads `.env.local` automatically.
-7. Deploy to Vercel.
-8. Set Telegram webhook to `/api/telegram/webhook`.
+Use [Project onboarding lesson](../lessons/0001-project-onboarding.html) for the full personal setup path.
 
-Setup is conservative:
+The Notion setup script is conservative:
 
 - creates missing databases
 - reuses matching databases
 - stops on schema conflicts
 - does not mutate incompatible existing schema automatically
+
+## Deployment Model
+
+GitHub Actions runs checks only. Vercel Git integration owns preview and production deployment. The operational flow lives in [Checks and Deployment](ci-cd.md) and the onboarding lesson.
 
 ## Failure Handling
 

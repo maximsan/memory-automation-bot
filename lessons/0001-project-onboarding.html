@@ -233,30 +233,81 @@
     </div>
 
     <h2>2. Setup Path</h2>
+    <p>This is the canonical setup guide. Other docs should point here instead of repeating these steps.</p>
+
+    <h3>Local files</h3>
     <ol>
       <li>Install dependencies: <code>npm install</code>.</li>
       <li>Copy env template: <code>cp .env.example .env.local</code>.</li>
-      <li>Create a Telegram bot with BotFather and set <code>TELEGRAM_BOT_TOKEN</code>.</li>
-      <li>Send a message to your bot, then run <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates"</code> before a webhook is set. Use the numeric <code>message.from.id</code> for <code>TELEGRAM_ALLOWED_USER_IDS</code>.</li>
-      <li>Create a Notion internal integration, create a parent page named <code>Project Memory Bot</code>, share the page with the integration, and set <code>NOTION_TOKEN</code> plus <code>NOTION_PARENT_PAGE_ID</code>.</li>
-      <li>Add <code>OPENAI_API_KEY</code> and <code>CRON_SECRET</code>.</li>
-      <li>Optional seed only: copy <code>config/projects.example.json</code> to <code>config/projects.json</code> if you want setup to create your first project rows. Otherwise, add projects later with <code>/addproject</code>.</li>
-      <li>Run <code>npm run setup:notion</code> to create or reuse the Notion databases. The script loads <code>.env.local</code> automatically.</li>
-      <li>Deploy to Vercel and copy the production URL.</li>
-      <li>Set the Telegram webhook: <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://YOUR_PROJECT.vercel.app/api/telegram/webhook"</code>.</li>
+      <li>Keep real values only in <code>.env.local</code> and Vercel environment variables. Do not put real tokens in <code>.env.example</code>.</li>
     </ol>
 
-    <p>Primary setup docs live in <a href="../README.md">README.md</a>, <a href="../docs/product-spec.md">product-spec.md</a>, and <a href="../docs/version-a-vercel.md">version-a-vercel.md</a>.</p>
+    <h3>Telegram</h3>
+    <ol>
+      <li>Create a bot with BotFather.</li>
+      <li>Set <code>TELEGRAM_BOT_TOKEN</code> in <code>.env.local</code>.</li>
+      <li>Send a fresh message to the bot from your Telegram account.</li>
+      <li>Before setting a webhook, run <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates"</code>.</li>
+      <li>Use the numeric <code>message.from.id</code> as <code>TELEGRAM_ALLOWED_USER_IDS</code>.</li>
+    </ol>
+    <p>If <code>getUpdates</code> returns an empty result, send a new message to the bot and try again. If a webhook was already set, remove it first with <code>deleteWebhook</code> or use the user ID you already know.</p>
+
+    <h3>Notion</h3>
+    <ol>
+      <li>Create a Notion internal integration.</li>
+      <li>Use the integration secret as <code>NOTION_TOKEN</code>.</li>
+      <li>Create a parent page named <code>Project Memory Bot</code>. A private page is enough for this personal version.</li>
+      <li>Share that parent page with the integration.</li>
+      <li>Copy the page ID from the Notion page URL and set it as <code>NOTION_PARENT_PAGE_ID</code>.</li>
+    </ol>
+    <p>The setup script creates or reuses the <code>Projects</code>, <code>Notes</code>, and <code>Tasks</code> databases under that parent page.</p>
+
+    <h3>OpenAI and cron</h3>
+    <ol>
+      <li>Set <code>OPENAI_API_KEY</code>.</li>
+      <li>Set <code>CRON_SECRET</code> to any long random value. It is just the bearer secret for the weekly cron route.</li>
+      <li>Model and limit variables can stay at the values from <code>.env.example</code> unless you intentionally change them.</li>
+    </ol>
+
+    <h3>Seed projects and Notion databases</h3>
+    <ol>
+      <li>Optional seed only: copy <code>config/projects.example.json</code> to <code>config/projects.json</code> if you want setup to create first project rows.</li>
+      <li>Skip the seed file if you prefer to add projects later from Telegram with <code>/addproject</code>.</li>
+      <li>Run <code>npm run setup:notion</code>. The script loads <code>.env.local</code> automatically.</li>
+    </ol>
+
+    <h3>Vercel and GitHub</h3>
+    <ol>
+      <li>Connect the GitHub repository to Vercel.</li>
+      <li>Add the same runtime secrets from <code>.env.local</code> to the Vercel project environment variables.</li>
+      <li>GitHub Actions only runs checks from <code>.github/workflows/checks.yml</code>. It does not deploy and does not need Vercel deploy secrets.</li>
+      <li>Vercel Git integration creates preview deployments for pull requests and production deployments from <code>main</code>.</li>
+      <li>For the safest simple flow, enable GitHub branch protection on <code>main</code> and require the <code>Checks</code> workflow before merge.</li>
+    </ol>
+
+    <h3>First deployment and webhook</h3>
+    <ol>
+      <li>Push a branch and open a pull request.</li>
+      <li>Wait for GitHub <code>Checks</code>.</li>
+      <li>Open the Vercel preview URL and verify <code>/api/health</code>.</li>
+      <li>Merge to <code>main</code>.</li>
+      <li>Open the Vercel production URL and verify <code>/api/health</code>.</li>
+      <li>Set the Telegram webhook: <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://YOUR_PROJECT.vercel.app/api/telegram/webhook"</code>.</li>
+      <li>Send a simple Telegram text capture and approve it.</li>
+    </ol>
+
+    <h3>Local cron test</h3>
+    <p>Use <code>?force=1</code> only for local manual cron testing. It bypasses the weekly schedule and bearer token on localhost, but production rejects forced cron runs.</p>
 
     <h2>Local vs Deployed</h2>
-    <p>Local development is for fixtures, type checks, prompt edits, and unit tests. The real end-to-end bot is deployment-first because Telegram needs a public HTTPS webhook and the queue worker is Vercel-owned.</p>
+    <p>Local development is for fixtures, type checks, prompt edits, and unit tests. Vercel deployment is needed for the real Telegram webhook and queue worker. GitHub Actions does not deploy this project; it only runs checks. Vercel Git integration owns preview and production deployments.</p>
 
     <h2>3. Development Loop</h2>
     <pre><code>npm run lint
 npm run typecheck
 npm test
 npm run build</code></pre>
-    <p>Use the full loop before deployment-facing changes. For a tiny prompt-only edit, start with focused tests, then run the full loop before deploying.</p>
+    <p>Use the full loop before deployment-facing changes. GitHub runs the same checks in <code>.github/workflows/checks.yml</code>. For a tiny prompt-only edit, start with focused tests, then run the full loop before opening a pull request.</p>
 
     <h2>4. Trace One Capture</h2>
     <ol>
@@ -301,6 +352,13 @@ npm run build</code></pre>
       <input id="q3" autocomplete="off" placeholder="path/to/file.md">
       <button type="button" data-answer="docs/product-spec.md" data-target="r3">Check</button>
       <div id="r3" class="result" aria-live="polite"></div>
+    </div>
+
+    <div class="checkpoint">
+      <label for="q4">Which file describes why GitHub checks do not deploy this project?</label>
+      <input id="q4" autocomplete="off" placeholder="path/to/file.md">
+      <button type="button" data-answer="docs/ci-cd.md" data-target="r4">Check</button>
+      <div id="r4" class="result" aria-live="polite"></div>
     </div>
 
     <h2>Primary Source To Read</h2>

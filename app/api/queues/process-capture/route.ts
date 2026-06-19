@@ -11,11 +11,12 @@ export const runtime = "nodejs";
 
 const queueHandler = handleCallback<CaptureJob>(async (message) => {
   const config = loadConfig();
+
   await processCaptureJob(message, {
     notion: createNotionStore(config),
     telegram: createTelegramClient(config.telegramBotToken),
     openai: createOpenAiClient(config),
-    prompts: await loadPrompts()
+    prompts: await loadPrompts(),
   });
 });
 
