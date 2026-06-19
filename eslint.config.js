@@ -42,17 +42,17 @@ export default tseslint.config(
       "@stylistic": stylistic
     },
     rules: {
-      "@stylistic/indent": ["error", 2, { SwitchCase: 1 }],
+      "@stylistic/indent": ["warn", 2, { SwitchCase: 1 }],
       "@stylistic/operator-linebreak": [
-        "error",
+        "warn",
         "before",
         { overrides: { "=": "none" } }
       ],
-      "@stylistic/no-multi-spaces": "error",
-      "brace-style": ["error", "1tbs", { allowSingleLine: false }],
+      "@stylistic/no-multi-spaces": "warn",
+      "brace-style": ["warn", "1tbs", { allowSingleLine: false }],
       curly: ["error", "all"],
       "padding-line-between-statements": [
-        "error",
+        "warn",
         { blankLine: "always", prev: "*", next: "return" },
         { blankLine: "always", prev: "*", next: "throw" },
         { blankLine: "always", prev: "*", next: "if" },

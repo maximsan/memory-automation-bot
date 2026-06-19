@@ -22,8 +22,8 @@ export async function GET(request: Request) {
   }
 
   if (
-    !force &&
-    !isConfiguredReminderHour(config.timezone, config.weeklyReminderHour)
+    !force
+    && !isConfiguredReminderHour(config.timezone, config.weeklyReminderHour)
   ) {
     return Response.json({ skipped: true });
   }
