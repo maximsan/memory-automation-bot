@@ -48,63 +48,72 @@ export type TelegramUpdate = {
   callback_query?: TelegramCallbackQuery;
 };
 
-export type ParsedTelegramUpdate =
-  | { kind: "unauthorized"; userId?: string }
+export type ParsedTelegramUpdate = | { kind: "unauthorized"; userId?: string }
   | {
-      kind: "command";
-      chatId: string;
-      messageId: string;
-      command: string;
-      args: string;
-    }
+    kind: "command";
+    chatId: string;
+    messageId: string;
+    command: string;
+    args: string;
+  }
   | { kind: "capture"; job: Omit<CaptureJob, "noteId" | "reviewMessageId"> }
   | {
-      kind: "summaryEdit";
-      chatId: string;
-      messageId: string;
-      reviewMessageId: string;
-      text: string;
-    }
+    kind: "summaryEdit";
+    chatId: string;
+    messageId: string;
+    reviewMessageId: string;
+    text: string;
+  }
   | {
-      kind: "callback";
-      callbackId: string;
-      userId: string;
-      chatId?: string;
-      messageId?: string;
-      data: string;
-    }
+    kind: "callback";
+    callbackId: string;
+    userId: string;
+    chatId?: string;
+    messageId?: string;
+    data: string;
+  }
   | { kind: "ignored" };
 
+/**
+ * Converts raw Telegram webhook payloads into the bot's small internal event
+ * union. Keeping this parser pure makes command/capture/callback behavior easy
+ * to test without a live Telegram bot.
+ */
 export function parseTelegramUpdate(
   update: TelegramUpdate,
   allowedUserIds: string[],
 ): ParsedTelegramUpdate {
   if (update.callback_query) {
     const userId = String(update.callback_query.from.id);
-    if (!allowedUserIds.includes(userId))
+
+    if (!allowedUserIds.includes(userId)) {
       return { kind: "unauthorized", userId };
+    }
+
     return {
       kind: "callback",
       callbackId: update.callback_query.id,
       userId,
       chatId:
-        update.callback_query.message ?
-          String(update.callback_query.message.chat.id)
-        : undefined,
+        update.callback_query.message
+          ? String(update.callback_query.message.chat.id)
+          : undefined,
       messageId:
-        update.callback_query.message ?
-          String(update.callback_query.message.message_id)
-        : undefined,
+        update.callback_query.message
+          ? String(update.callback_query.message.message_id)
+          : undefined,
       data: update.callback_query.data ?? "",
     };
   }
 
   const message = update.message;
+
   if (!message) {
     return { kind: "ignored" };
   }
 
   const userId = message.from ? String(message.from.id) : undefined;
+
   if (!userId || !allowedUserIds.includes(userId)) {
     return { kind: "unauthorized", userId };
   }
@@ -112,10 +121,12 @@ export function parseTelegramUpdate(
   const chatId = String(message.chat.id);
   const messageId = String(message.message_id);
 
+  // In v1, replying to a review message with plain text means "replace the
+  // summary". It avoids a separate edit wizard in Telegram.
   if (
-    message.reply_to_message &&
-    message.text &&
-    !message.text.startsWith("/")
+    message.reply_to_message
+    && message.text
+    && !message.text.startsWith("/")
   ) {
     return {
       kind: "summaryEdit",
@@ -139,6 +150,7 @@ export function parseTelegramUpdate(
   }
 
   const capture = captureFromMessage(message);
+
   if (!capture) {
     return { kind: "ignored" };
   }
@@ -164,6 +176,8 @@ function captureFromMessage(
   }
 
   if (message.photo?.length) {
+    // Telegram sends multiple photo sizes. The largest gives OpenAI the best
+    // chance to read handwriting without storing original media in Notion.
     const largest = [...message.photo].sort(
       (a, b) => b.width * b.height - a.width * a.height,
     )[0];

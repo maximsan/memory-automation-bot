@@ -1,5 +1,11 @@
 import type { TelegramKeyboard } from "./types";
 
+/**
+ * Escape user and AI text for Telegram MarkdownV2.
+ *
+ * Telegram rejects the whole message on malformed Markdown, so all dynamic
+ * formatted text must pass through this helper before sending.
+ */
 export function escapeTelegramMarkdown(value: string): string {
   return value.replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, "\\$1");
 }
@@ -36,27 +42,26 @@ export function reviewKeyboard(
   hasTask: boolean,
   noteUrl?: string,
 ): TelegramKeyboard {
-  const rows: TelegramKeyboard =
-    hasTask ?
+  const rows: TelegramKeyboard = hasTask
+    ? [
       [
-        [
-          { text: "Approve + task", callbackData: `at:${noteId}` },
-          { text: "Approve note only", callbackData: `an:${noteId}` },
-        ],
-        [
-          { text: "Wrong project", callbackData: `wp:${noteId}` },
-          { text: "Edit", callbackData: `ed:${noteId}` },
-          { text: "Remove", callbackData: `rm:${noteId}` },
-        ],
-      ]
+        { text: "Approve + task", callbackData: `at:${noteId}` },
+        { text: "Approve note only", callbackData: `an:${noteId}` },
+      ],
+      [
+        { text: "Wrong project", callbackData: `wp:${noteId}` },
+        { text: "Edit", callbackData: `ed:${noteId}` },
+        { text: "Remove", callbackData: `rm:${noteId}` },
+      ],
+    ]
     : [
-        [{ text: "Approve", callbackData: `an:${noteId}` }],
-        [
-          { text: "Wrong project", callbackData: `wp:${noteId}` },
-          { text: "Edit", callbackData: `ed:${noteId}` },
-          { text: "Remove", callbackData: `rm:${noteId}` },
-        ],
-      ];
+      [{ text: "Approve", callbackData: `an:${noteId}` }],
+      [
+        { text: "Wrong project", callbackData: `wp:${noteId}` },
+        { text: "Edit", callbackData: `ed:${noteId}` },
+        { text: "Remove", callbackData: `rm:${noteId}` },
+      ],
+    ];
 
   if (noteUrl) {
     rows.push([{ text: "Open in Notion", url: noteUrl }]);

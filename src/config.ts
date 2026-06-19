@@ -23,22 +23,35 @@ export type AppConfig = {
 
 function required(name: string): string {
   const value = process.env[name];
+
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
+
   return value;
 }
 
 function numberEnv(name: string, fallback: number): number {
   const value = process.env[name];
-  if (!value) return fallback;
+
+  if (!value) {
+    return fallback;
+  }
   const parsed = Number.parseInt(value, 10);
+
   if (!Number.isFinite(parsed)) {
     throw new Error(`Invalid numeric environment variable: ${name}`);
   }
+
   return parsed;
 }
 
+/**
+ * Loads runtime config at route-handler boundaries.
+ *
+ * Required secrets fail fast so a misconfigured deployment does not accept
+ * Telegram captures that it cannot persist or process.
+ */
 export function loadConfig(): AppConfig {
   return {
     telegramBotToken: required("TELEGRAM_BOT_TOKEN"),

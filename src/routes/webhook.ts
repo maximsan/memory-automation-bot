@@ -1,10 +1,5 @@
 import type { AppConfig } from "@/config";
 import {
-  formatReviewMessage,
-  reviewKeyboard,
-  escapeTelegramMarkdown,
-} from "@/core/format";
-import {
   approveReviewedNote,
   buildProjectPicker,
   renderNoteReview,
@@ -28,6 +23,14 @@ export type WebhookDeps = {
   prompts: PromptSet;
 };
 
+/**
+ * Top-level Telegram update dispatcher.
+ *
+ * This is deliberately a thin adapter: it validates the sender, routes commands,
+ * captures, summary edits, and button callbacks, then delegates durable work to
+ * Notion/core services. Capture handling creates the Notion note before queueing
+ * so Vercel Queue is never the source of truth.
+ */
 export async function handleTelegramWebhook(
   update: TelegramUpdate,
   deps: WebhookDeps,
@@ -37,7 +40,9 @@ export async function handleTelegramWebhook(
     deps.config.allowedTelegramUserIds,
   );
 
-  if (parsed.kind === "unauthorized" || parsed.kind === "ignored") return;
+  if (parsed.kind === "unauthorized" || parsed.kind === "ignored") {
+    return;
+  }
 
   if (parsed.kind === "command") {
     if (parsed.command === "clean") {
@@ -75,9 +80,8 @@ export async function handleTelegramWebhook(
 
     const updated = await deps.notion.updateNoteSummary(note.id, parsed.text);
 
-    const project =
-      updated.projectId ?
-        await deps.notion.getProject(updated.projectId)
+    const project = updated.projectId
+      ? await deps.notion.getProject(updated.projectId)
       : undefined;
     const review = renderNoteReview(updated, project);
 
@@ -108,9 +112,9 @@ async function handleCapture(
   deps: WebhookDeps,
 ): Promise<void> {
   if (
-    job.sourceType === "text" &&
-    job.text &&
-    job.text.length > deps.config.maxTextChars
+    job.sourceType === "text"
+    && job.text
+    && job.text.length > deps.config.maxTextChars
   ) {
     await deps.telegram.sendMessage({
       chatId: job.chatId,
@@ -122,9 +126,9 @@ async function handleCapture(
   }
 
   if (
-    job.sourceType === "voice" &&
-    job.voiceDuration &&
-    job.voiceDuration > deps.config.maxVoiceSeconds
+    job.sourceType === "voice"
+    && job.voiceDuration
+    && job.voiceDuration > deps.config.maxVoiceSeconds
   ) {
     await deps.telegram.sendMessage({
       chatId: job.chatId,
@@ -139,10 +143,13 @@ async function handleCapture(
     job.chatId,
     job.messageId,
   );
+
   if (existing) {
     return;
   }
 
+  // Durable state first, queue second. If queueing fails, the capture is still
+  // visible in Notion as Needs Review instead of being lost in Telegram only.
   const note = await deps.notion.createNoteFromCapture(job);
   const review = await deps.telegram.sendMessage({
     chatId: job.chatId,
@@ -162,7 +169,10 @@ async function handleCallback(
   deps: WebhookDeps,
 ): Promise<void> {
   const [action, noteId, extra] = parsed.data.split(":");
-  if (!parsed.chatId || !parsed.messageId || !noteId) return;
+
+  if (!parsed.chatId || !parsed.messageId || !noteId) {
+    return;
+  }
   await deps.telegram.answerCallbackQuery(parsed.callbackId);
 
   if (action === "rm") {
@@ -172,6 +182,7 @@ async function handleCallback(
       messageId: parsed.messageId,
       text: "Removed.",
     });
+
     return;
   }
 
@@ -181,6 +192,7 @@ async function handleCallback(
       messageId: parsed.messageId,
       text: "Reply to this message with the corrected summary.",
     });
+
     return;
   }
 
@@ -193,6 +205,7 @@ async function handleCallback(
       keyboard: picker.keyboard,
       markdown: true,
     });
+
     return;
   }
 
@@ -210,6 +223,7 @@ async function handleCallback(
       keyboard: review.keyboard,
       markdown: true,
     });
+
     return;
   }
 
@@ -222,19 +236,22 @@ async function handleCallback(
         recentNotes: deps.config.recentNotes,
         maxTasks: deps.config.maxTasks,
       });
+      const savedKeyboard = result.project.url
+        ? [[{ text: "Open project", url: result.project.url }]]
+        : undefined;
+
       await deps.telegram.editMessage({
         chatId: parsed.chatId,
         messageId: parsed.messageId,
         text: savedMessage(result.project, result.taskCreated),
-        keyboard:
-          result.project.url ?
-            [[{ text: "Open project", url: result.project.url }]]
-          : undefined,
+        keyboard: savedKeyboard,
         markdown: true,
       });
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Could not approve this note";
+      const message = error instanceof Error
+        ? error.message
+        : "Could not approve this note";
+
       await deps.telegram.editMessage({
         chatId: parsed.chatId,
         messageId: parsed.messageId,
@@ -250,8 +267,12 @@ async function cleanRecentMessages(
 ): Promise<void> {
   const notes = await deps.notion.recentNotesForCleaning(20);
   let deleted = 0;
+
   for (const note of notes) {
-    if (note.telegramChatId !== chatId) continue;
+    if (note.telegramChatId !== chatId) {
+      continue;
+    }
+
     for (const messageId of [
       note.telegramReviewMessageId,
       note.telegramMessageId,
@@ -260,7 +281,8 @@ async function cleanRecentMessages(
         await deps.telegram.deleteMessage(chatId, messageId);
         deleted += 1;
       } catch {
-        // Telegram refuses deletion for older messages. Ignore it.
+        // Telegram refuses deletion for older messages. Notion remains the
+        // durable record, so cleanup failures are safe to ignore.
       }
     }
   }

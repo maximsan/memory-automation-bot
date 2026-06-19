@@ -28,14 +28,16 @@ export function createOpenAiClient(config: AppConfig): OpenAiClient {
 
   return {
     async extract(input) {
+      // Media is first reduced to text/transcript, then the shared extraction
+      // prompt turns all capture types into the same JSON contract.
       const extractedText = await getCaptureText(client, config, input);
       const content = [
         `${input.prompt}`,
         "",
         `Known projects: ${input.knownProjects.map((project) => project.name).join(", ") || "none"}`,
-        input.job.userHint ?
-          `User hint: ${input.job.userHint}`
-        : "User hint: none",
+        input.job.userHint
+          ? `User hint: ${input.job.userHint}`
+          : "User hint: none",
         "",
         `Extracted content:\n${extractedText}`,
       ].join("\n");
@@ -53,7 +55,11 @@ export function createOpenAiClient(config: AppConfig): OpenAiClient {
       });
 
       const raw = completion.choices[0]?.message.content;
-      if (!raw) throw new Error("OpenAI returned an empty extraction response");
+
+      if (!raw) {
+        throw new Error("OpenAI returned an empty extraction response");
+      }
+
       return parseAiExtraction(JSON.parse(raw));
     },
 
@@ -91,8 +97,9 @@ async function getCaptureText(
     return input.job.text ?? "";
   }
 
-  if (!input.telegramFileUrl)
+  if (!input.telegramFileUrl) {
     throw new Error("Capture media is missing a file URL");
+  }
 
   if (input.job.sourceType === "voice") {
     const response = await fetch(input.telegramFileUrl);
@@ -119,6 +126,8 @@ async function getCaptureText(
 
   const bytes = Buffer.from(await response.arrayBuffer());
   const mimeType = response.headers.get("content-type") ?? "image/jpeg";
+  // Vision input is sent as a transient data URL. Notion stores only text fields
+  // unless a later feature explicitly adds media retention.
   const dataUrl = `data:${mimeType};base64,${bytes.toString("base64")}`;
 
   const completion = await client.chat.completions.create({

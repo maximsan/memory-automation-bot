@@ -1,7 +1,6 @@
 import type { ProjectRecord } from "./types";
 
-export type ProjectMatch =
-  | { kind: "matched"; project: ProjectRecord }
+export type ProjectMatch = | { kind: "matched"; project: ProjectRecord }
   | { kind: "ambiguous"; projects: ProjectRecord[] }
   | { kind: "none" };
 
@@ -10,6 +9,7 @@ export function matchProject(
   projects: ProjectRecord[],
 ): ProjectMatch {
   const normalized = normalize(query);
+
   if (!normalized) {
     return { kind: "none" };
   }
@@ -38,6 +38,7 @@ export function matchProject(
 
 function scoreProject(query: string, project: ProjectRecord): number {
   const name = normalize(project.name);
+
   if (name === query) {
     return 100;
   }
@@ -47,13 +48,15 @@ function scoreProject(query: string, project: ProjectRecord): number {
   }
 
   let bestAlias = 0;
+
   for (const alias of project.aliases) {
     const normalizedAlias = normalize(alias);
+
     if (normalizedAlias === query) {
       bestAlias = Math.max(bestAlias, 90);
     } else if (
-      normalizedAlias.includes(query) ||
-      query.includes(normalizedAlias)
+      normalizedAlias.includes(query)
+      || query.includes(normalizedAlias)
     ) {
       bestAlias = Math.max(bestAlias, 70);
     }

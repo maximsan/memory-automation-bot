@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { IntegrationError, ProcessingError } from "./errors";
+import { IntegrationError } from "./errors";
 import { formatReviewMessage, reviewKeyboard } from "./format";
 import { matchProject } from "./projectMatcher";
 import type {
@@ -7,7 +7,6 @@ import type {
   CaptureJob,
   NoteRecord,
   ProjectRecord,
-  TaskRecord,
 } from "./types";
 
 export type ProcessCaptureDeps = {
@@ -45,35 +44,42 @@ export type ProcessCaptureDeps = {
   };
 };
 
+/**
+ * Queue-worker core for a pending capture.
+ *
+ * The function is kept Effect-based and dependency-injected so tests can run
+ * the full processing path without real OpenAI, Telegram, or Notion calls.
+ */
 export function processCaptureJobEffect(
   job: CaptureJob,
   deps: ProcessCaptureDeps,
 ) {
   return Effect.gen(function* () {
     const note = yield* tryNotion(() => deps.notion.getNote(job.noteId));
+
     if (!note) {
       return;
     }
 
     if (
-      job.sourceType === "voice" &&
-      job.voiceDuration &&
-      job.voiceDuration > 300
+      job.sourceType === "voice"
+      && job.voiceDuration
+      && job.voiceDuration > 300
     ) {
       yield* totalFailure(
         job,
         deps,
         "Voice note is too long. Please keep v1 voice notes under 5 minutes.",
       );
+
       return;
     }
 
     const projects = yield* tryNotion(() => deps.notion.listActiveProjects());
-    const telegramFileUrl =
-      job.fileId ?
-        yield* tryTelegram(() =>
-          deps.telegram.getFileDownloadUrl(job.fileId as string),
-        )
+    const telegramFileUrl = job.fileId
+      ? yield* tryTelegram(() =>
+        deps.telegram.getFileDownloadUrl(job.fileId as string),
+      )
       : undefined;
 
     const extraction = yield* Effect.tryPromise({
@@ -111,8 +117,9 @@ export function processCaptureJobEffect(
     }
 
     const matchedProject = matchProject(extraction.project, projects);
-    const project =
-      matchedProject.kind === "matched" ? matchedProject.project : undefined;
+    const project = matchedProject.kind === "matched"
+      ? matchedProject.project
+      : undefined;
 
     const updatedNote = yield* tryNotion(() =>
       deps.notion.updateNoteExtraction({
@@ -159,7 +166,10 @@ function totalFailure(
   message: string,
 ) {
   return Effect.gen(function* () {
+    // A total extraction failure should not leave a useless Needs Review row.
+    // Partial extraction failures are handled earlier by keeping the note.
     yield* tryNotion(() => deps.notion.trashNote(job.noteId));
+
     if (job.reviewMessageId) {
       yield* tryTelegram(() =>
         deps.telegram.editMessage({

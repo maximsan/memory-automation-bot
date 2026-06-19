@@ -9,6 +9,7 @@ export async function GET(request: Request) {
   const config = loadConfig();
   const auth = request.headers.get("authorization");
   const force = new URL(request.url).searchParams.get("force") === "1";
+
   if (auth !== `Bearer ${config.cronSecret}` && !force) {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -26,6 +27,7 @@ export async function GET(request: Request) {
     text: ["*Weekly check-in:*", formatActive(counts), "", "Use /active"].join("\n"),
     markdown: true
   });
+
   return Response.json({ ok: true });
 }
 
@@ -38,5 +40,6 @@ function isConfiguredReminderHour(timezone: string, hour: number): boolean {
   }).formatToParts(new Date());
   const weekday = parts.find((part) => part.type === "weekday")?.value;
   const currentHour = Number(parts.find((part) => part.type === "hour")?.value);
+
   return weekday === "Mon" && currentHour === hour;
 }

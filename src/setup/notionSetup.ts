@@ -18,6 +18,13 @@ const REVIEW_STATUSES = ["Needs Review", "Approved", "Error"];
 const SOURCE_TYPES = ["text", "photo", "voice"];
 const TASK_STATUSES = ["Proposed", "Next", "Doing", "Blocked", "Done"];
 
+/**
+ * Creates the minimal Notion schema under the user-provided parent page.
+ *
+ * This setup is conservative by design: it creates missing databases, reuses
+ * compatible ones, and fails on conflicting schemas instead of editing existing
+ * user-owned databases automatically.
+ */
 export async function setupNotion(input: {
   notionToken: string;
   parentPageId: string;
@@ -26,23 +33,21 @@ export async function setupNotion(input: {
   const notion = new Client({ auth: input.notionToken });
   const existing = await listChildDatabases(notion, input.parentPageId);
 
-  const projectsId =
-    (await ensureDatabase({
-      notion,
-      parentPageId: input.parentPageId,
-      existing,
-      title: "Projects",
-      properties: projectProperties()
-    })) ?? "";
+  const projectsId = (await ensureDatabase({
+    notion,
+    parentPageId: input.parentPageId,
+    existing,
+    title: "Projects",
+    properties: projectProperties()
+  })) ?? "";
 
-  const notesId =
-    (await ensureDatabase({
-      notion,
-      parentPageId: input.parentPageId,
-      existing: await listChildDatabases(notion, input.parentPageId),
-      title: "Notes",
-      properties: noteProperties(projectsId)
-    })) ?? "";
+  const notesId = (await ensureDatabase({
+    notion,
+    parentPageId: input.parentPageId,
+    existing: await listChildDatabases(notion, input.parentPageId),
+    title: "Notes",
+    properties: noteProperties(projectsId)
+  })) ?? "";
 
   await ensureDatabase({
     notion,
@@ -63,6 +68,7 @@ async function ensureDatabase(input: {
   properties: Record<string, unknown>;
 }): Promise<string> {
   const found = input.existing.find((database) => database.title === input.title);
+
   if (!found) {
     const created = await input.notion.databases.create({
       parent: { type: "page_id", page_id: input.parentPageId },
@@ -70,6 +76,7 @@ async function ensureDatabase(input: {
       properties: input.properties as any
     });
     console.log(`Created ${input.title} database: ${created.id}`);
+
     return created.id;
   }
 
@@ -78,6 +85,7 @@ async function ensureDatabase(input: {
   })) as any;
   assertCompatibleSchema(input.title, database.properties, input.properties);
   console.log(`Reused ${input.title} database: ${found.id}`);
+
   return found.id;
 }
 
@@ -89,6 +97,7 @@ async function listChildDatabases(
     block_id: parentPageId,
     page_size: 100
   });
+
   return children.results
     .map((block: any) =>
       block.type === "child_database"
@@ -103,12 +112,16 @@ function assertCompatibleSchema(
   actual: Record<string, any>,
   expected: Record<string, any>
 ): void {
+  // This intentionally checks only required property names and types. Option
+  // lists may grow over time, but a type mismatch would break runtime writes.
   for (const [name, expectedShape] of Object.entries(expected)) {
     const actualProperty = actual[name];
+
     if (!actualProperty) {
       throw new Error(`${title} database is missing property: ${name}`);
     }
     const expectedType = Object.keys(expectedShape as Record<string, unknown>)[0];
+
     if (actualProperty.type !== expectedType) {
       throw new Error(
         `${title}.${name} should be ${expectedType}, got ${actualProperty.type}`
@@ -163,16 +176,22 @@ async function seedProjects(
   projectsId: string,
   projectsPath = path.join(process.cwd(), "config", "projects.json")
 ): Promise<void> {
-  if (!existsSync(projectsPath)) return;
+  if (!existsSync(projectsPath)) {
+    return;
+  }
   const seeds = JSON.parse(await readFile(projectsPath, "utf8")) as SeedProject[];
 
   for (const seed of seeds) {
+    // Project seeding is idempotent by title so local setup can be rerun safely.
     const existing = await notion.databases.query({
       database_id: projectsId,
       page_size: 1,
       filter: { property: "Name", title: { equals: seed.name } }
     });
-    if (existing.results.length > 0) continue;
+
+    if (existing.results.length > 0) {
+      continue;
+    }
 
     await notion.pages.create({
       parent: { database_id: projectsId },

@@ -21,7 +21,10 @@ describe("matchProject", () => {
   it("matches aliases", () => {
     const matched = matchProject("dedup", projects);
     expect(matched.kind).toBe("matched");
-    if (matched.kind === "matched") expect(matched.project.id).toBe("1");
+
+    if (matched.kind === "matched") {
+      expect(matched.project.id).toBe("1");
+    }
   });
 
   it("returns none when there is no query", () => {

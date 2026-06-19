@@ -25,6 +25,9 @@ export function createNotionStore(config: AppConfig) {
   let databaseIdsPromise: Promise<DatabaseIds> | undefined;
 
   async function databaseIds(): Promise<DatabaseIds> {
+    // The setup script creates the databases as children of one parent page.
+    // Runtime only needs the parent id, so database ids are discovered once and
+    // cached for the life of the serverless invocation.
     databaseIdsPromise ??= findDatabaseIds(notion, config.notionParentPageId);
 
     return databaseIdsPromise;
@@ -34,6 +37,7 @@ export function createNotionStore(config: AppConfig) {
     async getNote(noteId: string): Promise<NoteRecord | null> {
       try {
         const page = await notion.pages.retrieve({ page_id: noteId });
+
         return pageToNote(page as any);
       } catch {
         return null;
@@ -127,9 +131,9 @@ export function createNotionStore(config: AppConfig) {
       const page = await notion.pages.update({
         page_id: input.noteId,
         properties: {
-          ...(input.projectId ?
-            { Project: { relation: [{ id: input.projectId }] } }
-          : {}),
+          ...(input.projectId
+            ? { Project: { relation: [{ id: input.projectId }] } }
+            : {}),
           "Cleaned Summary": richTextProperty(input.summary),
           "Proposed Task": richTextProperty(input.proposedTask ?? ""),
         },
@@ -302,40 +306,44 @@ export function createNotionStore(config: AppConfig) {
       recentlyUpdatedProjects: number;
     }> {
       const ids = await databaseIds();
-      const [needsReview, proposedTasks, nextTasks, recentProjects] =
-        await Promise.all([
-          notion.databases.query({
-            database_id: ids.notes,
-            page_size: 100,
-            filter: {
-              property: "Review Status",
-              select: { equals: "Needs Review" },
-            },
-          }),
-          notion.databases.query({
-            database_id: ids.tasks,
-            page_size: 100,
-            filter: { property: "Status", select: { equals: "Proposed" } },
-          }),
-          notion.databases.query({
-            database_id: ids.tasks,
-            page_size: 100,
-            filter: { property: "Status", select: { equals: "Next" } },
-          }),
-          notion.databases.query({
-            database_id: ids.projects,
-            page_size: 100,
-            filter: {
-              and: [
-                { property: "Status", select: { equals: "Active" } },
-                {
-                  property: "Last Updated",
-                  date: { on_or_after: weekAgoIsoDate() },
-                },
-              ],
-            },
-          }),
-        ]);
+      const [
+        needsReview,
+        proposedTasks,
+        nextTasks,
+        recentProjects,
+      ] = await Promise.all([
+        notion.databases.query({
+          database_id: ids.notes,
+          page_size: 100,
+          filter: {
+            property: "Review Status",
+            select: { equals: "Needs Review" },
+          },
+        }),
+        notion.databases.query({
+          database_id: ids.tasks,
+          page_size: 100,
+          filter: { property: "Status", select: { equals: "Proposed" } },
+        }),
+        notion.databases.query({
+          database_id: ids.tasks,
+          page_size: 100,
+          filter: { property: "Status", select: { equals: "Next" } },
+        }),
+        notion.databases.query({
+          database_id: ids.projects,
+          page_size: 100,
+          filter: {
+            and: [
+              { property: "Status", select: { equals: "Active" } },
+              {
+                property: "Last Updated",
+                date: { on_or_after: weekAgoIsoDate() },
+              },
+            ],
+          },
+        }),
+      ]);
 
       return {
         needsReview: needsReview.results.length,
@@ -362,21 +370,24 @@ async function findDatabaseIds(
   notion: Client,
   parentPageId: string,
 ): Promise<DatabaseIds> {
+  // Keep env config small by resolving database ids from stable child database
+  // titles under NOTION_PARENT_PAGE_ID.
   const children = await notion.blocks.children.list({
     block_id: parentPageId,
     page_size: 100,
   });
   const entries = children.results
     .map((block: any) =>
-      block.type === "child_database" ?
-        { id: block.id, title: block.child_database.title }
-      : null,
+      block.type === "child_database"
+        ? { id: block.id, title: block.child_database.title }
+        : null,
     )
     .filter(Boolean) as Array<{ id: string; title: string }>;
 
   const projects = entries.find((entry) => entry.title === "Projects")?.id;
   const notes = entries.find((entry) => entry.title === "Notes")?.id;
   const tasks = entries.find((entry) => entry.title === "Tasks")?.id;
+
   if (!projects || !notes || !tasks) {
     throw new Error(
       "Could not find Projects, Notes, and Tasks databases under the Notion parent page",
@@ -389,6 +400,8 @@ async function findDatabaseIds(
 function pageToProject(page: any): ProjectRecord {
   const props = page.properties;
 
+  // Notion SDK page objects are broad unions. These mappers keep unsafe property
+  // reads contained at the API boundary and expose small domain records inside.
   return {
     id: page.id,
     name: titleValue(props.Name),
@@ -408,8 +421,8 @@ function pageToNote(page: any): NoteRecord {
   return {
     id: page.id,
     projectId: props.Project?.relation?.[0]?.id,
-    reviewStatus: (selectValue(props["Review Status"]) ||
-      "Needs Review") as ReviewStatus,
+    reviewStatus: (selectValue(props["Review Status"])
+      || "Needs Review") as ReviewStatus,
     sourceType: (selectValue(props["Source Type"]) || "text") as SourceType,
     originalText: richTextValue(props["Original Text"]),
     cleanedSummary: richTextValue(props["Cleaned Summary"]),
@@ -471,5 +484,6 @@ function truncate(value: string, max: number): string {
 function weekAgoIsoDate(): string {
   const date = new Date();
   date.setDate(date.getDate() - 7);
+
   return date.toISOString();
 }

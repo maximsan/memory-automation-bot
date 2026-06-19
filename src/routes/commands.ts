@@ -35,10 +35,16 @@ export async function handleCommand(input: {
     }
 
     case "project": {
-      if (!input.args) return "Usage: /project <name>";
+      if (!input.args) {
+        return "Usage: /project <name>";
+      }
       const projects = await input.notion.listActiveProjects();
       const matched = matchProject(input.args, projects);
-      if (matched.kind === "none") return "Project not found.";
+
+      if (matched.kind === "none") {
+        return "Project not found.";
+      }
+
       if (matched.kind === "ambiguous") {
         return `Multiple matches: ${matched.projects
           .map((project) => project.name)
@@ -62,16 +68,16 @@ export async function handleCommand(input: {
         escapeTelegramMarkdown(project.projectState || "No state yet."),
         "",
         "*Recent notes:*",
-        ...(notes.length ?
-          notes.map(
+        ...(notes.length
+          ? notes.map(
             (note) => `- ${escapeTelegramMarkdown(note.cleanedSummary || "")}`,
           )
-        : ["- none"]),
+          : ["- none"]),
         "",
         "*Tasks:*",
-        ...(tasks.length ?
-          tasks.map((task) => `- ${escapeTelegramMarkdown(task.name)}`)
-        : ["- none"]),
+        ...(tasks.length
+          ? tasks.map((task) => `- ${escapeTelegramMarkdown(task.name)}`)
+          : ["- none"]),
       ];
 
       return lines.join("\n");

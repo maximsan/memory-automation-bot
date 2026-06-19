@@ -44,6 +44,7 @@ describe("parseTelegramUpdate", () => {
     );
 
     expect(parsed.kind).toBe("capture");
+
     if (parsed.kind === "capture") {
       expect(parsed.job).toMatchObject({
         sourceType: "photo",

@@ -41,6 +41,7 @@ export function createTelegramClient(botToken: string): TelegramClient {
       result?: T;
       description?: string;
     };
+
     if (!response.ok || !payload.ok) {
       throw new Error(payload.description ?? `Telegram ${method} failed`);
     }
@@ -56,9 +57,9 @@ export function createTelegramClient(botToken: string): TelegramClient {
         parse_mode: input.markdown ? "MarkdownV2" : undefined,
         reply_to_message_id: input.replyToMessageId,
         reply_markup:
-          input.keyboard ?
-            { inline_keyboard: toTelegramKeyboard(input.keyboard) }
-          : undefined,
+          input.keyboard
+            ? { inline_keyboard: toTelegramKeyboard(input.keyboard) }
+            : undefined,
       });
 
       return { messageId: String(result.message_id) };
@@ -71,9 +72,9 @@ export function createTelegramClient(botToken: string): TelegramClient {
         text: input.text,
         parse_mode: input.markdown ? "MarkdownV2" : undefined,
         reply_markup:
-          input.keyboard ?
-            { inline_keyboard: toTelegramKeyboard(input.keyboard) }
-          : undefined,
+          input.keyboard
+            ? { inline_keyboard: toTelegramKeyboard(input.keyboard) }
+            : undefined,
       });
     },
 

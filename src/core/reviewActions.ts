@@ -3,7 +3,6 @@ import {
   formatReviewMessage,
   reviewKeyboard,
 } from "./format";
-import { matchProject } from "./projectMatcher";
 import type { NoteRecord, ProjectRecord, TelegramKeyboard } from "./types";
 
 export type ReviewDeps = {
@@ -50,6 +49,12 @@ export type ReviewDeps = {
   maxTasks: number;
 };
 
+/**
+ * Commit point for a reviewed note.
+ *
+ * Approval is intentionally the only path that mutates project state or creates
+ * tasks. Before this function runs, AI output is only a pending note.
+ */
 export async function approveReviewedNote(
   noteId: string,
   createTask: boolean,
@@ -81,6 +86,7 @@ export async function approveReviewedNote(
   );
 
   let taskCreated = false;
+
   if (createTask && note.proposedTask) {
     await deps.notion.createTask({
       title: note.proposedTask,
@@ -116,6 +122,8 @@ export async function buildProjectPicker(
 
   return {
     text: "*Choose project:*",
+    // Callback payloads carry the list index to keep Telegram button data short.
+    // The selected index is resolved against the current active project list.
     keyboard: projects
       .slice(0, 10)
       .map((project, index) => [
@@ -163,13 +171,4 @@ export function renderNoteReview(note: NoteRecord, project?: ProjectRecord) {
     }),
     keyboard: reviewKeyboard(note.id, Boolean(proposedTask), note.url),
   };
-}
-
-export async function chooseProjectFromExtraction(
-  projectName: string | null | undefined,
-  projects: ProjectRecord[],
-): Promise<ProjectRecord | undefined> {
-  const matched = matchProject(projectName, projects);
-
-  return matched.kind === "matched" ? matched.project : undefined;
 }
