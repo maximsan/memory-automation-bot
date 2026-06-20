@@ -11,21 +11,13 @@ export async function GET(request: Request) {
   const auth = request.headers.get("authorization");
 
   // `?force=1` is a local development escape hatch for manually testing the
-  // weekly reminder route without waiting for Monday 09:00 or sending the
-  // Vercel Cron bearer token. `allowsLocalForceRun` keeps this unavailable on
-  // Vercel and on non-local hosts, so production still requires cron auth and
-  // the configured reminder hour.
+  // weekly reminder route without waiting for Vercel Cron or sending the
+  // bearer token. `allowsLocalForceRun` keeps this unavailable on Vercel and
+  // on non-local hosts, so production still requires cron auth.
   const force = allowsLocalForceRun(request);
 
   if (!force && auth !== `Bearer ${config.cronSecret}`) {
     return new Response("Unauthorized", { status: 401 });
-  }
-
-  if (
-    !force
-    && !isConfiguredReminderHour(config.timezone, config.weeklyReminderHour)
-  ) {
-    return Response.json({ skipped: true });
   }
 
   const notion = createNotionStore(config);
@@ -42,17 +34,4 @@ export async function GET(request: Request) {
   });
 
   return Response.json({ ok: true });
-}
-
-function isConfiguredReminderHour(timezone: string, hour: number): boolean {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    weekday: "short",
-    hour: "numeric",
-    hourCycle: "h23",
-  }).formatToParts(new Date());
-  const weekday = parts.find((part) => part.type === "weekday")?.value;
-  const currentHour = Number(parts.find((part) => part.type === "hour")?.value);
-
-  return weekday === "Mon" && currentHour === hour;
 }

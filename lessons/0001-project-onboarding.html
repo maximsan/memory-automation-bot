@@ -1,397 +1,583 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lesson 0001: Project Onboarding</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #151b23;
-      --muted: #59636e;
-      --line: #d8dee4;
-      --paper: #ffffff;
-      --wash: #f6f8fa;
-      --accent: #1f6feb;
-      --good: #1a7f37;
-      --bad: #b42318;
-    }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 0001: Project Onboarding</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #151b23;
+        --muted: #59636e;
+        --line: #d8dee4;
+        --paper: #ffffff;
+        --wash: #f6f8fa;
+        --accent: #1f6feb;
+        --good: #1a7f37;
+        --bad: #b42318;
+      }
 
-    body {
-      margin: 0;
-      background: var(--wash);
-      color: var(--ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.5;
-    }
-
-    main {
-      max-width: 900px;
-      margin: 42px auto;
-      padding: 38px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-    }
-
-    header {
-      padding-bottom: 22px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    h1,
-    h2,
-    h3 {
-      margin: 0;
-      line-height: 1.12;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      letter-spacing: -0.015em;
-    }
-
-    h2 {
-      margin-top: 34px;
-      font-size: 1.25rem;
-      color: var(--accent);
-    }
-
-    h3 {
-      margin-top: 18px;
-      font-size: 1rem;
-    }
-
-    p {
-      color: var(--muted);
-      max-width: 74ch;
-    }
-
-    a {
-      color: var(--accent);
-    }
-
-    code,
-    pre {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    code {
-      padding: 1px 4px;
-      border-radius: 4px;
-      background: #eef2f6;
-      font-size: 0.9em;
-    }
-
-    pre {
-      overflow-x: auto;
-      padding: 14px 16px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #f8fafc;
-      font-size: 0.92rem;
-    }
-
-    ol,
-    ul {
-      padding-left: 1.25rem;
-    }
-
-    li + li {
-      margin-top: 7px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 14px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px 16px;
-      background: #fbfcfd;
-    }
-
-    .card strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .checkpoint {
-      margin-top: 16px;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfcfd;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 650;
-    }
-
-    input {
-      width: min(100%, 560px);
-      box-sizing: border-box;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      font: inherit;
-    }
-
-    button {
-      margin-left: 8px;
-      padding: 10px 14px;
-      border: 1px solid #174ea6;
-      border-radius: 6px;
-      background: var(--accent);
-      color: white;
-      font: inherit;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 10px;
-      font-weight: 650;
-    }
-
-    .result.good {
-      color: var(--good);
-    }
-
-    .result.bad {
-      color: var(--bad);
-    }
-
-    @media print {
       body {
-        background: white;
+        margin: 0;
+        background: var(--wash);
+        color: var(--ink);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
       }
 
       main {
-        margin: 0;
-        border: 0;
-        border-radius: 0;
+        max-width: 900px;
+        margin: 42px auto;
+        padding: 38px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 8px;
       }
 
-      button,
-      input {
-        display: none;
+      header {
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--line);
       }
-    }
 
-    @media (max-width: 720px) {
-      main {
+      h1,
+      h2,
+      h3 {
         margin: 0;
-        padding: 24px;
-        border: 0;
-        border-radius: 0;
+        line-height: 1.12;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+        letter-spacing: -0.015em;
+      }
+
+      h2 {
+        margin-top: 34px;
+        font-size: 1.25rem;
+        color: var(--accent);
+      }
+
+      h3 {
+        margin-top: 18px;
+        font-size: 1rem;
+      }
+
+      p {
+        color: var(--muted);
+        max-width: 74ch;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      code {
+        padding: 1px 4px;
+        border-radius: 4px;
+        background: #eef2f6;
+        font-size: 0.9em;
+      }
+
+      pre {
+        overflow-x: auto;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #f8fafc;
+        font-size: 0.92rem;
+      }
+
+      ol,
+      ul {
+        padding-left: 1.25rem;
+      }
+
+      li + li {
+        margin-top: 7px;
       }
 
       .grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px 16px;
+        background: #fbfcfd;
+      }
+
+      .card strong {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .checkpoint {
+        margin-top: 16px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcfd;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 650;
+      }
+
+      input {
+        width: min(100%, 560px);
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: inherit;
       }
 
       button {
-        margin: 8px 0 0;
-        display: block;
+        margin-left: 8px;
+        padding: 10px 14px;
+        border: 1px solid #174ea6;
+        border-radius: 6px;
+        background: var(--accent);
+        color: white;
+        font: inherit;
+        cursor: pointer;
       }
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <header>
-      <h1>Project Onboarding</h1>
-      <p>Goal: in about 15 minutes, know how to setup the bot, trace one capture, and choose the right file for the next change.</p>
-    </header>
 
-    <h2>1. Mental Model</h2>
-    <p>This project is not a Notion app, not an n8n workflow, and not a general assistant. Version A is a small Next.js API service that uses Telegram for capture/review and Notion for durable state.</p>
+      .result {
+        margin-top: 10px;
+        font-weight: 650;
+      }
 
-    <div class="grid">
-      <div class="card">
-        <strong>Telegram</strong>
-        Capture surface and review buttons.
+      .result.good {
+        color: var(--good);
+      }
+
+      .result.bad {
+        color: var(--bad);
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        main {
+          margin: 0;
+          border: 0;
+          border-radius: 0;
+        }
+
+        button,
+        input {
+          display: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        main {
+          margin: 0;
+          padding: 24px;
+          border: 0;
+          border-radius: 0;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        button {
+          margin: 8px 0 0;
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Project Onboarding</h1>
+        <p>
+          Goal: in about 15 minutes, know how to setup the bot, trace one
+          capture, and choose the right file for the next change.
+        </p>
+      </header>
+
+      <h2>1. Mental Model</h2>
+      <p>
+        This project is not a Notion app, not an n8n workflow, and not a general
+        assistant. Version A is a small Next.js API service that uses Telegram
+        for capture/review and Notion for durable state.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <strong>Telegram</strong>
+          Capture surface and review buttons.
+        </div>
+        <div class="card">
+          <strong>Notion</strong>
+          Durable source of truth: Projects, Notes, Tasks.
+        </div>
+        <div class="card">
+          <strong>OpenAI</strong>
+          Extracts summary, project guess, and at most one task.
+        </div>
+        <div class="card">
+          <strong>Vercel Queue</strong>
+          Moves slow AI/media work out of the webhook path.
+        </div>
       </div>
-      <div class="card">
-        <strong>Notion</strong>
-        Durable source of truth: Projects, Notes, Tasks.
-      </div>
-      <div class="card">
-        <strong>OpenAI</strong>
-        Extracts summary, project guess, and at most one task.
-      </div>
-      <div class="card">
-        <strong>Vercel Queue</strong>
-        Moves slow AI/media work out of the webhook path.
-      </div>
-    </div>
 
-    <h2>2. Setup Path</h2>
-    <p>This is the canonical setup guide. Other docs should point here instead of repeating these steps.</p>
+      <h2>2. Setup Path</h2>
+      <p>
+        This is the canonical setup guide. Other docs should point here instead
+        of repeating these steps.
+      </p>
 
-    <h3>Local files</h3>
-    <ol>
-      <li>Install dependencies: <code>npm install</code>.</li>
-      <li>Copy env template: <code>cp .env.example .env.local</code>.</li>
-      <li>Keep real values only in <code>.env.local</code> and Vercel environment variables. Do not put real tokens in <code>.env.example</code>.</li>
-    </ol>
+      <h3>Local files</h3>
+      <ol>
+        <li>Install dependencies: <code>npm install</code>.</li>
+        <li>Copy env template: <code>cp .env.example .env.local</code>.</li>
+        <li>
+          Keep real values only in <code>.env.local</code> and Vercel
+          environment variables. Do not put real tokens in
+          <code>.env.example</code>.
+        </li>
+      </ol>
 
-    <h3>Telegram</h3>
-    <ol>
-      <li>Create a bot with BotFather.</li>
-      <li>Set <code>TELEGRAM_BOT_TOKEN</code> in <code>.env.local</code>.</li>
-      <li>Send a fresh message to the bot from your Telegram account.</li>
-      <li>Before setting a webhook, run <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates"</code>.</li>
-      <li>Use the numeric <code>message.from.id</code> as <code>TELEGRAM_ALLOWED_USER_IDS</code>.</li>
-    </ol>
-    <p>If <code>getUpdates</code> returns an empty result, send a new message to the bot and try again. If a webhook was already set, remove it first with <code>deleteWebhook</code> or use the user ID you already know.</p>
+      <h3>Telegram</h3>
+      <ol>
+        <li>Create a bot with BotFather.</li>
+        <li>Set <code>TELEGRAM_BOT_TOKEN</code> in <code>.env.local</code>.</li>
+        <li>Send a fresh message to the bot from your Telegram account.</li>
+        <li>
+          Before setting a webhook, run
+          <code
+            >curl
+            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getUpdates"</code
+          >.
+        </li>
+        <li>
+          Use the numeric <code>message.from.id</code> as
+          <code>TELEGRAM_ALLOWED_USER_IDS</code>.
+        </li>
+      </ol>
+      <p>
+        If <code>getUpdates</code> returns an empty result, send a new message
+        to the bot and try again. If a webhook was already set, remove it first
+        with <code>deleteWebhook</code> or use the user ID you already know.
+      </p>
 
-    <h3>Notion</h3>
-    <ol>
-      <li>Create a Notion internal integration.</li>
-      <li>Use the integration secret as <code>NOTION_TOKEN</code>.</li>
-      <li>Create a parent page named <code>Project Memory Bot</code>. A private page is enough for this personal version.</li>
-      <li>Share that parent page with the integration.</li>
-      <li>Copy the page ID from the Notion page URL and set it as <code>NOTION_PARENT_PAGE_ID</code>.</li>
-    </ol>
-    <p>The setup script creates or reuses the <code>Projects</code>, <code>Notes</code>, and <code>Tasks</code> databases under that parent page.</p>
+      <h3>Notion</h3>
+      <ol>
+        <li>Create a Notion internal integration.</li>
+        <li>Use the integration secret as <code>NOTION_TOKEN</code>.</li>
+        <li>
+          Create a parent page named <code>Project Memory Bot</code>. A private
+          page is enough for this personal version.
+        </li>
+        <li>Share that parent page with the integration.</li>
+        <li>
+          Copy the page ID from the Notion page URL and set it as
+          <code>NOTION_PARENT_PAGE_ID</code>.
+        </li>
+      </ol>
+      <p>
+        The setup script creates or reuses the <code>Projects</code>,
+        <code>Notes</code>, and <code>Tasks</code> databases under that parent
+        page.
+      </p>
 
-    <h3>OpenAI and cron</h3>
-    <ol>
-      <li>Set <code>OPENAI_API_KEY</code>.</li>
-      <li>Set <code>CRON_SECRET</code> to any long random value. It is just the bearer secret for the weekly cron route.</li>
-      <li>Model and limit variables can stay at the values from <code>.env.example</code> unless you intentionally change them.</li>
-    </ol>
+      <h3>OpenAI and cron</h3>
+      <ol>
+        <li>Set <code>OPENAI_API_KEY</code>.</li>
+        <li>
+          Set <code>CRON_SECRET</code> to any long random value. It is just the
+          bearer secret for the weekly cron route.
+        </li>
+        <li>
+          The weekly reminder uses one Vercel cron job. It is intentionally
+          approximate; the requirement is once per week.
+        </li>
+        <li>
+          Model and limit variables can stay at the values from
+          <code>.env.example</code> unless you intentionally change them.
+        </li>
+      </ol>
 
-    <h3>Seed projects and Notion databases</h3>
-    <ol>
-      <li>Optional seed only: copy <code>config/projects.example.json</code> to <code>config/projects.json</code> if you want setup to create first project rows.</li>
-      <li>Skip the seed file if you prefer to add projects later from Telegram with <code>/addproject</code>.</li>
-      <li>Run <code>npm run setup:notion</code>. The script loads <code>.env.local</code> automatically.</li>
-    </ol>
+      <h3>Seed projects and Notion databases</h3>
+      <ol>
+        <li>
+          Optional seed only: copy <code>config/projects.example.json</code> to
+          <code>config/projects.json</code> if you want setup to create first
+          project rows.
+        </li>
+        <li>
+          Skip the seed file if you prefer to add projects later from Telegram
+          with <code>/addproject</code>.
+        </li>
+        <li>
+          Run <code>npm run setup:notion</code>. The script loads
+          <code>.env.local</code> automatically.
+        </li>
+      </ol>
 
-    <h3>Vercel and GitHub</h3>
-    <ol>
-      <li>Connect the GitHub repository to Vercel.</li>
-      <li>Add the same runtime secrets from <code>.env.local</code> to the Vercel project environment variables.</li>
-      <li>GitHub Actions only runs checks from <code>.github/workflows/checks.yml</code>. It does not deploy and does not need Vercel deploy secrets.</li>
-      <li>Vercel Git integration creates preview deployments for pull requests and production deployments from <code>main</code>.</li>
-      <li>For the safest simple flow, enable GitHub branch protection on <code>main</code> and require the <code>Checks</code> workflow before merge.</li>
-    </ol>
+      <h3>Vercel and GitHub</h3>
+      <ol>
+        <li>Connect the GitHub repository to Vercel.</li>
+        <li>
+          Add the same runtime secrets from <code>.env.local</code> to the
+          Vercel project environment variables.
+        </li>
+        <li>
+          GitHub Actions only runs checks from
+          <code>.github/workflows/checks.yml</code>. It does not deploy and does
+          not need Vercel deploy secrets.
+        </li>
+        <li>
+          Vercel Git integration creates preview deployments for pull requests
+          and production deployments from <code>main</code>.
+        </li>
+        <li>
+          For the safest simple flow, enable GitHub branch protection on
+          <code>main</code> and require the <code>Checks</code> workflow before
+          merge.
+        </li>
+      </ol>
 
-    <h3>First deployment and webhook</h3>
-    <ol>
-      <li>Push a branch and open a pull request.</li>
-      <li>Wait for GitHub <code>Checks</code>.</li>
-      <li>Open the Vercel preview URL and verify <code>/api/health</code>.</li>
-      <li>Merge to <code>main</code>.</li>
-      <li>Open the Vercel production URL and verify <code>/api/health</code>.</li>
-      <li>Set the Telegram webhook: <code>curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://YOUR_PROJECT.vercel.app/api/telegram/webhook"</code>.</li>
-      <li>Send a simple Telegram text capture and approve it.</li>
-    </ol>
+      <h3>First deployment and webhook</h3>
+      <ol>
+        <li>Push a branch and open a pull request.</li>
+        <li>Wait for GitHub <code>Checks</code>.</li>
+        <li>
+          Open the Vercel preview URL and verify <code>/api/health</code>.
+        </li>
+        <li>Merge to <code>main</code>.</li>
+        <li>
+          Open the Vercel production URL and verify <code>/api/health</code>.
+        </li>
+        <li>
+          Set the Telegram webhook:
+          <code
+            >curl
+            "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook?url=https://YOUR_PROJECT.vercel.app/api/telegram/webhook"</code
+          >.
+        </li>
+        <li>Send a simple Telegram text capture and approve it.</li>
+      </ol>
 
-    <h3>Local cron test</h3>
-    <p>Use <code>?force=1</code> only for local manual cron testing. It bypasses the weekly schedule and bearer token on localhost, but production rejects forced cron runs.</p>
+      <h3>Local cron test</h3>
+      <p>
+        Use <code>?force=1</code> only for local manual cron testing. It
+        bypasses the weekly schedule and bearer token on localhost, but
+        production rejects forced cron runs.
+      </p>
 
-    <h2>Local vs Deployed</h2>
-    <p>Local development is for fixtures, type checks, prompt edits, and unit tests. Vercel deployment is needed for the real Telegram webhook and queue worker. GitHub Actions does not deploy this project; it only runs checks. Vercel Git integration owns preview and production deployments.</p>
+      <h2>Local vs Deployed</h2>
+      <p>
+        Local development is for fixtures, type checks, prompt edits, and unit
+        tests. Vercel deployment is needed for the real Telegram webhook and
+        queue worker. GitHub Actions does not deploy this project; it only runs
+        checks. Vercel Git integration owns preview and production deployments.
+      </p>
 
-    <h2>3. Development Loop</h2>
-    <pre><code>npm run lint
+      <h2>3. Development Loop</h2>
+      <pre><code>npm run lint
 npm run typecheck
 npm test
 npm run build</code></pre>
-    <p>Use the full loop before deployment-facing changes. GitHub runs the same checks in <code>.github/workflows/checks.yml</code>. For a tiny prompt-only edit, start with focused tests, then run the full loop before opening a pull request.</p>
+      <p>
+        Use the full loop before deployment-facing changes. GitHub runs the same
+        checks in <code>.github/workflows/checks.yml</code>. For a tiny
+        prompt-only edit, start with focused tests, then run the full loop
+        before opening a pull request.
+      </p>
 
-    <h2>4. Trace One Capture</h2>
-    <ol>
-      <li><code>app/api/telegram/webhook/route.ts</code> loads config and concrete integrations.</li>
-      <li><code>src/routes/webhook.ts</code> dispatches command, callback, summary edit, or capture.</li>
-      <li><code>src/core/telegram.ts</code> parses raw Telegram update payloads into a small internal union.</li>
-      <li><code>src/routes/webhook.ts</code> creates a Notion note before queueing, so Notion is the durable state.</li>
-      <li><code>app/api/queues/process-capture/route.ts</code> consumes queue jobs.</li>
-      <li><code>src/core/processCapture.ts</code> calls OpenAI, matches project, updates the note, and edits the Telegram review message.</li>
-      <li><code>src/core/reviewActions.ts</code> handles approval, project state updates, and optional task creation.</li>
-    </ol>
+      <h2>4. Trace One Capture</h2>
+      <ol>
+        <li>
+          <code>app/api/telegram/webhook/route.ts</code> loads config and
+          concrete integrations.
+        </li>
+        <li>
+          <code>src/routes/webhook.ts</code> dispatches command, callback,
+          summary edit, or capture.
+        </li>
+        <li>
+          <code>src/core/telegram.ts</code> parses raw Telegram update payloads
+          into a small internal union.
+        </li>
+        <li>
+          <code>src/routes/webhook.ts</code> creates a Notion note before
+          queueing, so Notion is the durable state.
+        </li>
+        <li>
+          <code>app/api/queues/process-capture/route.ts</code> consumes queue
+          jobs.
+        </li>
+        <li>
+          <code>src/core/processCapture.ts</code> calls OpenAI, matches project,
+          updates the note, and edits the Telegram review message.
+        </li>
+        <li>
+          <code>src/core/reviewActions.ts</code> handles approval, project state
+          updates, and optional task creation.
+        </li>
+      </ol>
 
-    <h2>5. Where To Edit First</h2>
-    <ul>
-      <li>Command behavior: <code>src/routes/commands.ts</code>.</li>
-      <li>Review text/buttons: <code>src/core/format.ts</code>.</li>
-      <li>AI extraction prompt: <code>prompts/extract-note.md</code>.</li>
-      <li>AI project state prompt: <code>prompts/update-project-state.md</code>.</li>
-      <li>Notion schema: update <code>docs/product-spec.md</code> first, then setup/store code.</li>
-      <li>Queue or cron: route under <code>app/api</code>, config in <code>vercel.json</code>.</li>
-    </ul>
+      <h2>5. Where To Edit First</h2>
+      <ul>
+        <li>Command behavior: <code>src/routes/commands.ts</code>.</li>
+        <li>Review text/buttons: <code>src/core/format.ts</code>.</li>
+        <li>AI extraction prompt: <code>prompts/extract-note.md</code>.</li>
+        <li>
+          AI project state prompt: <code>prompts/update-project-state.md</code>.
+        </li>
+        <li>
+          Notion schema: update <code>docs/product-spec.md</code> first, then
+          setup/store code.
+        </li>
+        <li>
+          Queue or cron: route under <code>app/api</code>, config in
+          <code>vercel.json</code>.
+        </li>
+      </ul>
 
-    <h2>6. Retrieval Check</h2>
-    <p>Answer from memory before looking back. This is the part that builds durable understanding.</p>
+      <h2>6. Retrieval Check</h2>
+      <p>
+        Answer from memory before looking back. This is the part that builds
+        durable understanding.
+      </p>
 
-    <div class="checkpoint">
-      <label for="q1">Which file should you inspect first when a Telegram photo becomes a Notion note twice?</label>
-      <input id="q1" autocomplete="off" placeholder="path/to/file.ts">
-      <button type="button" data-answer="src/routes/webhook.ts" data-target="r1">Check</button>
-      <div id="r1" class="result" aria-live="polite"></div>
-    </div>
+      <div class="checkpoint">
+        <label for="q1"
+          >Which file should you inspect first when a Telegram photo becomes a
+          Notion note twice?</label
+        >
+        <input id="q1" autocomplete="off" placeholder="path/to/file.ts" />
+        <button
+          type="button"
+          data-answer="src/routes/webhook.ts"
+          data-target="r1"
+        >
+          Check
+        </button>
+        <div id="r1" class="result" aria-live="polite"></div>
+      </div>
 
-    <div class="checkpoint">
-      <label for="q2">Which file owns the pure conversion from raw Telegram update to internal event?</label>
-      <input id="q2" autocomplete="off" placeholder="path/to/file.ts">
-      <button type="button" data-answer="src/core/telegram.ts" data-target="r2">Check</button>
-      <div id="r2" class="result" aria-live="polite"></div>
-    </div>
+      <div class="checkpoint">
+        <label for="q2"
+          >Which file owns the pure conversion from raw Telegram update to
+          internal event?</label
+        >
+        <input id="q2" autocomplete="off" placeholder="path/to/file.ts" />
+        <button
+          type="button"
+          data-answer="src/core/telegram.ts"
+          data-target="r2"
+        >
+          Check
+        </button>
+        <div id="r2" class="result" aria-live="polite"></div>
+      </div>
 
-    <div class="checkpoint">
-      <label for="q3">Which file should you update before changing Notion database fields?</label>
-      <input id="q3" autocomplete="off" placeholder="path/to/file.md">
-      <button type="button" data-answer="docs/product-spec.md" data-target="r3">Check</button>
-      <div id="r3" class="result" aria-live="polite"></div>
-    </div>
+      <div class="checkpoint">
+        <label for="q3"
+          >Which file should you update before changing Notion database
+          fields?</label
+        >
+        <input id="q3" autocomplete="off" placeholder="path/to/file.md" />
+        <button
+          type="button"
+          data-answer="docs/product-spec.md"
+          data-target="r3"
+        >
+          Check
+        </button>
+        <div id="r3" class="result" aria-live="polite"></div>
+      </div>
 
-    <div class="checkpoint">
-      <label for="q4">Which file describes why GitHub checks do not deploy this project?</label>
-      <input id="q4" autocomplete="off" placeholder="path/to/file.md">
-      <button type="button" data-answer="docs/ci-cd.md" data-target="r4">Check</button>
-      <div id="r4" class="result" aria-live="polite"></div>
-    </div>
+      <div class="checkpoint">
+        <label for="q4"
+          >Which file describes why GitHub checks do not deploy this
+          project?</label
+        >
+        <input id="q4" autocomplete="off" placeholder="path/to/file.md" />
+        <button type="button" data-answer="docs/ci-cd.md" data-target="r4">
+          Check
+        </button>
+        <div id="r4" class="result" aria-live="polite"></div>
+      </div>
 
-    <h2>Primary Source To Read</h2>
-    <p>Read the official <a href="https://nextjs.org/docs/app/api-reference/file-conventions/route">Next.js route handler docs</a> when you want to understand why the API entrypoints live in <code>app/api/**/route.ts</code>. For this project, route handlers are the outer shell; the important behavior should still stay in testable modules under <code>src</code>.</p>
+      <h2>Primary Source To Read</h2>
+      <p>
+        Read the official
+        <a
+          href="https://nextjs.org/docs/app/api-reference/file-conventions/route"
+          >Next.js route handler docs</a
+        >
+        when you want to understand why the API entrypoints live in
+        <code>app/api/**/route.ts</code>. For this project, route handlers are
+        the outer shell; the important behavior should still stay in testable
+        modules under <code>src</code>.
+      </p>
 
-    <h2>Next Lesson</h2>
-    <p>Ask the agent: "Teach me how to add one small command to this bot." That should be the first hands-on development exercise.</p>
+      <h2>Next Lesson</h2>
+      <p>
+        Ask the agent: "Teach me how to add one small command to this bot." That
+        should be the first hands-on development exercise.
+      </p>
 
-    <h2>Reference</h2>
-    <p>Use <a href="../reference/project-map.html">Project Memory Bot Reference Map</a> as the quick sheet after this lesson.</p>
-  </main>
+      <h2>Reference</h2>
+      <p>
+        Use
+        <a href="../reference/project-map.html"
+          >Project Memory Bot Reference Map</a
+        >
+        as the quick sheet after this lesson.
+      </p>
+    </main>
 
-  <script>
-    const normalize = (value) => value.trim().replaceAll("\\\\", "/").toLowerCase();
+    <script>
+      const normalize = (value) =>
+        value.trim().replaceAll("\\\\", "/").toLowerCase();
 
-    for (const button of document.querySelectorAll("button[data-answer]")) {
-      button.addEventListener("click", () => {
-        const input = button.previousElementSibling;
-        const result = document.getElementById(button.dataset.target);
-        const expected = normalize(button.dataset.answer);
-        const actual = normalize(input.value);
+      for (const button of document.querySelectorAll("button[data-answer]")) {
+        button.addEventListener("click", () => {
+          const input = button.previousElementSibling;
+          const result = document.getElementById(button.dataset.target);
+          const expected = normalize(button.dataset.answer);
+          const actual = normalize(input.value);
 
-        if (actual === expected) {
-          result.textContent = "Correct. You can now explain that part of the flow.";
-          result.className = "result good";
+          if (actual === expected) {
+            result.textContent =
+              "Correct. You can now explain that part of the flow.";
+            result.className = "result good";
 
-          return;
-        }
+            return;
+          }
 
-        result.textContent = `Not yet. Expected: ${button.dataset.answer}`;
-        result.className = "result bad";
-      });
-    }
-  </script>
-</body>
+          result.textContent = `Not yet. Expected: ${button.dataset.answer}`;
+          result.className = "result bad";
+        });
+      }
+    </script>
+  </body>
 </html>

@@ -139,7 +139,7 @@ Constraints:
 
 ## Reminder
 
-Weekly reminder is sent by Telegram, Monday at 09:00 Europe/Warsaw. It contains counts only:
+Weekly reminder is sent by Telegram once per week. It contains counts only:
 
 ```text
 Weekly check-in:

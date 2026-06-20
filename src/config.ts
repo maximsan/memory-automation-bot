@@ -10,9 +10,6 @@ export type AppConfig = {
   notionToken: string;
   notionParentPageId: string;
   cronSecret: string;
-  timezone: string;
-  weeklyReminderDay: number;
-  weeklyReminderHour: number;
   maxTextChars: number;
   maxVoiceSeconds: number;
   dailyCaptureSoftLimit: number;
@@ -67,15 +64,6 @@ export function loadConfig(): AppConfig {
     notionToken: required("NOTION_TOKEN"),
     notionParentPageId: required("NOTION_PARENT_PAGE_ID"),
     cronSecret: required("CRON_SECRET"),
-    timezone: process.env.BOT_TIMEZONE ?? botDefaults.timezone,
-    weeklyReminderDay: numberEnv(
-      "WEEKLY_REMINDER_DAY",
-      botDefaults.weeklyReminder.day
-    ),
-    weeklyReminderHour: numberEnv(
-      "WEEKLY_REMINDER_HOUR",
-      botDefaults.weeklyReminder.hour
-    ),
     maxTextChars: numberEnv("MAX_TEXT_CHARS", botDefaults.limits.maxTextChars),
     maxVoiceSeconds: numberEnv(
       "MAX_VOICE_SECONDS",

@@ -1,9 +1,4 @@
 {
-  "timezone": "Europe/Warsaw",
-  "weeklyReminder": {
-    "day": 1,
-    "hour": 9
-  },
   "limits": {
     "maxTextChars": 8000,
     "maxVoiceSeconds": 300,
