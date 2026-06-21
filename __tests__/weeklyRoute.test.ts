@@ -86,14 +86,11 @@ describe("weekly cron route", () => {
 
     await expect(response.text()).resolves.toBe("Internal Server Error");
     expect(response.status).toBe(500);
-    expect(console.error).toHaveBeenCalledWith(
-      "Weekly cron route failed",
-      {
-        error,
-        force: false,
-        recipientCount: 1,
-      },
-    );
+    expect(console.error).toHaveBeenCalledWith("Weekly cron route failed", {
+      error,
+      force: false,
+      recipientCount: 1,
+    });
     expect(mocks.sendMessage).not.toHaveBeenCalled();
   });
 

@@ -27,14 +27,15 @@ export async function POST(request: Request) {
       notion: createNotionStore(config),
       telegram,
       openai: createOpenAiClient(config),
-      prompts: await loadPrompts()
+      prompts: await loadPrompts(),
     });
   } catch (error) {
     logTelegramWebhookError({
       error,
       updateId: update?.update_id,
-      chatId: chatIdFromUpdate(update)
+      chatId: chatIdFromUpdate(update),
     });
+
     await sendFallbackMessage(telegram, chatIdFromUpdate(update));
   }
 
@@ -42,8 +43,8 @@ export async function POST(request: Request) {
 }
 
 function chatIdFromUpdate(update?: TelegramUpdate): string | undefined {
-  const chatId = update?.message?.chat.id
-    ?? update?.callback_query?.message?.chat.id;
+  const chatId =
+    update?.message?.chat.id ?? update?.callback_query?.message?.chat.id;
 
   return chatId === undefined ? undefined : String(chatId);
 }

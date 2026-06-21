@@ -29,9 +29,12 @@ export async function GET(request: Request) {
 
     await telegram.sendMessage({
       chatId,
-      text: ["*Weekly check\\-in:*", formatActive(counts), "", "Use /active"].join(
-        "\n",
-      ),
+      text: [
+        "*Weekly check\\-in:*",
+        formatActive(counts),
+        "",
+        "Use /active",
+      ].join("\n"),
       markdown: true,
     });
   } catch (error) {

@@ -47,9 +47,6 @@ export function logWeeklyCronError(context: WeeklyCronErrorContext): void {
   logRouteError("Weekly cron route failed", context);
 }
 
-function logRouteError(
-  message: string,
-  context: RouteErrorContext,
-): void {
+function logRouteError(message: string, context: RouteErrorContext): void {
   console.error(message, context);
 }
