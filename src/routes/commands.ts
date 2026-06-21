@@ -64,7 +64,9 @@ export async function handleCommand(input: {
       const matched = matchProject(input.args, projects);
 
       if (matched.kind === "none") {
-        return { text: "Project not found. Use /active to see current counts or /addproject <name> to add it." };
+        return {
+          text: "Project not found. Use /active to see current counts or /addproject <name> to add it.",
+        };
       }
 
       if (matched.kind === "ambiguous") {
@@ -86,22 +88,23 @@ export async function handleCommand(input: {
       ]);
 
       const lines = [
-        `*${escapeTelegramMarkdown(project.name)}*`,
+        `*Project:* ${escapeTelegramMarkdown(project.name)}`,
         "",
         "*State:*",
         escapeTelegramMarkdown(project.projectState || "No state yet."),
         "",
         "*Recent notes:*",
-        ...(notes.length
-          ? notes.map(
-            (note) => `\\- ${escapeTelegramMarkdown(note.cleanedSummary || "")}`,
+        ...(notes.length ?
+          notes.map(
+            (note) =>
+              `\\- ${escapeTelegramMarkdown(note.cleanedSummary || "")}`,
           )
-          : ["\\- none"]),
+        : ["\\- none"]),
         "",
         "*Tasks:*",
-        ...(tasks.length
-          ? tasks.map((task) => `\\- ${escapeTelegramMarkdown(task.name)}`)
-          : ["\\- none"]),
+        ...(tasks.length ?
+          tasks.map((task) => `\\- ${escapeTelegramMarkdown(task.name)}`)
+        : ["\\- none"]),
       ];
 
       return { text: lines.join("\n"), markdown: true };

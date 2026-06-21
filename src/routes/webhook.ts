@@ -82,8 +82,9 @@ export async function handleTelegramWebhook(
 
     const updated = await deps.notion.updateNoteSummary(note.id, parsed.text);
 
-    const project = updated.projectId
-      ? await deps.notion.getProject(updated.projectId)
+    const project =
+      updated.projectId ?
+        await deps.notion.getProject(updated.projectId)
       : undefined;
     const review = renderNoteReview(updated, project);
 
@@ -115,9 +116,9 @@ async function handleCapture(
   deps: WebhookDeps,
 ): Promise<void> {
   if (
-    job.sourceType === "text"
-    && job.text
-    && job.text.length > deps.config.maxTextChars
+    job.sourceType === "text" &&
+    job.text &&
+    job.text.length > deps.config.maxTextChars
   ) {
     await deps.telegram.sendMessage({
       chatId: job.chatId,
@@ -129,9 +130,9 @@ async function handleCapture(
   }
 
   if (
-    job.sourceType === "voice"
-    && job.voiceDuration
-    && job.voiceDuration > deps.config.maxVoiceSeconds
+    job.sourceType === "voice" &&
+    job.voiceDuration &&
+    job.voiceDuration > deps.config.maxVoiceSeconds
   ) {
     await deps.telegram.sendMessage({
       chatId: job.chatId,
@@ -243,6 +244,7 @@ async function handleCallback(
       deps,
     );
     const review = renderNoteReview(note, project);
+
     await deps.telegram.editMessage({
       chatId: parsed.chatId,
       messageId: parsed.messageId,
@@ -263,8 +265,10 @@ async function handleCallback(
         recentNotes: deps.config.recentNotes,
         maxTasks: deps.config.maxTasks,
       });
-      const savedKeyboard = result.project.url
-        ? [[{ text: "Open project", url: result.project.url }]]
+
+      const savedKeyboard =
+        result.project.url ?
+          [[{ text: "Open project", url: result.project.url }]]
         : undefined;
 
       await deps.telegram.editMessage({
@@ -275,9 +279,8 @@ async function handleCallback(
         markdown: true,
       });
     } catch (error) {
-      const message = error instanceof Error
-        ? error.message
-        : "Could not approve this note";
+      const message =
+        error instanceof Error ? error.message : "Could not approve this note";
 
       await deps.telegram.editMessage({
         chatId: parsed.chatId,

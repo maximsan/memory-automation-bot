@@ -1,6 +1,6 @@
 import { handleCallback } from "@vercel/queue";
 import { loadConfig } from "@/config";
-import { logRouteError } from "@/core/logging";
+import { logProcessCaptureQueueError } from "@/core/logging";
 import { processCaptureJob } from "@/core/processCapture";
 import type { CaptureJob } from "@/core/types";
 import { createNotionStore } from "@/integrations/notionStore";
@@ -21,7 +21,7 @@ const queueHandler = handleCallback<CaptureJob>(async (message) => {
       prompts: await loadPrompts(),
     });
   } catch (error) {
-    logRouteError("Process capture queue job failed", {
+    logProcessCaptureQueueError({
       error,
       noteId: message.noteId,
       chatId: message.chatId,

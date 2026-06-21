@@ -1,7 +1,7 @@
 import { loadConfig } from "@/config";
 import { allowsLocalForceRun } from "@/core/cron";
 import { formatActive } from "@/core/format";
-import { logRouteError } from "@/core/logging";
+import { logWeeklyCronError } from "@/core/logging";
 import { createNotionStore } from "@/integrations/notionStore";
 import { createTelegramClient } from "@/integrations/telegramClient";
 
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       markdown: true,
     });
   } catch (error) {
-    logRouteError("Weekly cron route failed", {
+    logWeeklyCronError({
       error,
       force,
       recipientCount: config.allowedTelegramUserIds.length,
