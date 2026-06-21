@@ -90,5 +90,58 @@ describe("telegram webhook route", () => {
       text: "Something went wrong while processing that message. I logged the error. Please try again or use /help.",
     });
     expect(fallbackBody.parse_mode).toBeUndefined();
+    expect(console.error).toHaveBeenCalledWith(
+      "Telegram webhook failed",
+      expect.objectContaining({
+        updateId: 1,
+        chatId: "42",
+      }),
+    );
+    expect(console.error).toHaveBeenCalledTimes(1);
+  });
+
+  it("logs fallback failure and still acknowledges Telegram", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(telegramResponse({ ok: true, result: true }))
+      .mockResolvedValueOnce(
+        telegramResponse({
+          ok: false,
+          responseOk: false,
+          description: "Bad Request: can't parse entities",
+        }),
+      )
+      .mockResolvedValueOnce(
+        telegramResponse({
+          ok: false,
+          responseOk: false,
+          description: "fallback down",
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(
+      new Request("https://example.com/api/telegram/webhook", {
+        method: "POST",
+        body: JSON.stringify({
+          update_id: 2,
+          message: {
+            message_id: 10,
+            from: { id: 42 },
+            chat: { id: 42, type: "private" },
+            text: "/help",
+          },
+        }),
+      }),
+    );
+
+    await expect(response.json()).resolves.toEqual({ ok: true });
+    expect(response.status).toBe(200);
+
+    expect(console.error).toHaveBeenCalledWith(
+      "Could not send Telegram fallback message",
+      expect.objectContaining({
+        chatId: "42",
+      }),
+    );
   });
 });
