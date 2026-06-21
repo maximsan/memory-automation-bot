@@ -6,7 +6,7 @@ const projects: ProjectRecord[] = [
   {
     id: "1",
     name: "cleanup-photos",
-    aliases: ["photo cleanup", "dedup"],
+    aliases: ["photo cleanup", "dedup", "memory bot"],
     status: "Active"
   },
   {
@@ -20,6 +20,15 @@ const projects: ProjectRecord[] = [
 describe("matchProject", () => {
   it("matches aliases", () => {
     const matched = matchProject("dedup", projects);
+    expect(matched.kind).toBe("matched");
+
+    if (matched.kind === "matched") {
+      expect(matched.project.id).toBe("1");
+    }
+  });
+
+  it("matches alias phrases", () => {
+    const matched = matchProject("memory bot", projects);
     expect(matched.kind).toBe("matched");
 
     if (matched.kind === "matched") {

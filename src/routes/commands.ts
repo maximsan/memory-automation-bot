@@ -30,13 +30,22 @@ export async function handleCommand(input: {
     }
 
     case "addproject": {
-      if (!input.args) {
-        return { text: "Usage: /addproject <name>" };
+      const projectInput = parseAddProjectArgs(input.args);
+
+      if (!projectInput) {
+        return { text: addProjectUsage() };
       }
 
-      const project = await input.notion.createProject(input.args);
+      const project = await input.notion.createProject(
+        projectInput.name,
+        projectInput.aliases,
+      );
+      const aliasLine =
+        projectInput.aliases.length ?
+          `\nAliases: ${projectInput.aliases.join(", ")}`
+        : "";
 
-      return { text: `Added project: ${project.name}` };
+      return { text: `Added project: ${project.name}${aliasLine}` };
     }
 
     case "project": {
@@ -64,7 +73,9 @@ export async function handleCommand(input: {
       const matched = matchProject(input.args, projects);
 
       if (matched.kind === "none") {
-        return { text: "Project not found. Use /active to see current counts or /addproject <name> to add it." };
+        return {
+          text: "Project not found. Use /active to see current counts or /addproject <name> [| alias, alias] to add it.",
+        };
       }
 
       if (matched.kind === "ambiguous") {
@@ -92,16 +103,17 @@ export async function handleCommand(input: {
         escapeTelegramMarkdown(project.projectState || "No state yet."),
         "",
         "*Recent notes:*",
-        ...(notes.length
-          ? notes.map(
-            (note) => `\\- ${escapeTelegramMarkdown(note.cleanedSummary || "")}`,
+        ...(notes.length ?
+          notes.map(
+            (note) =>
+              `\\- ${escapeTelegramMarkdown(note.cleanedSummary || "")}`,
           )
-          : ["\\- none"]),
+        : ["\\- none"]),
         "",
         "*Tasks:*",
-        ...(tasks.length
-          ? tasks.map((task) => `\\- ${escapeTelegramMarkdown(task.name)}`)
-          : ["\\- none"]),
+        ...(tasks.length ?
+          tasks.map((task) => `\\- ${escapeTelegramMarkdown(task.name)}`)
+        : ["\\- none"]),
       ];
 
       return { text: lines.join("\n"), markdown: true };
@@ -115,4 +127,29 @@ export async function handleCommand(input: {
     default:
       return { text: "Unknown command. Use /help." };
   }
+}
+
+function parseAddProjectArgs(
+  args: string,
+): { name: string; aliases: string[] } | null {
+  const [rawName = "", rawAliases = ""] = args.split("|", 2);
+  const name = rawName.trim();
+
+  if (!name) {
+    return null;
+  }
+
+  const aliases = rawAliases
+    .split(",")
+    .map((alias) => alias.trim())
+    .filter(Boolean);
+
+  return { name, aliases };
+}
+
+function addProjectUsage(): string {
+  return [
+    "Usage: /addproject <name>",
+    "Optional aliases: /addproject <name> | alias, alias",
+  ].join("\n");
 }

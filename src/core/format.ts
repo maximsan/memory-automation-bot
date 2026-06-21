@@ -82,7 +82,7 @@ export function formatHelp(): string {
     "Commands:",
     "/active - show pending reviews and next work",
     "/project <name> - show one project state only",
-    "/addproject <name> - add a project",
+    "/addproject <name> [| alias, alias] - add a project",
     "/clean - remove temporary chat messages",
     "/help - show this",
   ].join("\n");

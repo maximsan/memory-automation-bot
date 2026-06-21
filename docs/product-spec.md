@@ -30,7 +30,7 @@ Commands:
 
 - `/active` shows counts first: notes needing review, proposed tasks, next tasks, recently updated projects.
 - `/project <name>` shows one project state, three recent notes, and up to five tasks.
-- `/addproject <name>` creates an active project.
+- `/addproject <name> [| alias, alias]` creates an active project and optional aliases.
 - `/clean` deletes temporary Telegram messages where Telegram still allows it.
 - `/help` shows a short command list.
 
