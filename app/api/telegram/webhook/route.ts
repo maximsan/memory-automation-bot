@@ -4,6 +4,7 @@ import { createOpenAiClient } from "@/integrations/openaiClient";
 import { loadPrompts } from "@/integrations/prompts";
 import { createTelegramClient } from "@/integrations/telegramClient";
 import { handleTelegramWebhook } from "@/routes/webhook";
+import { logRouteError } from "@/core/logging";
 import type { TelegramUpdate } from "@/core/telegram";
 
 export const runtime = "nodejs";
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
       prompts: await loadPrompts()
     });
   } catch (error) {
-    console.error("Telegram webhook failed", {
+    logRouteError("Telegram webhook failed", {
       error,
       updateId: update?.update_id,
       chatId: chatIdFromUpdate(update)
@@ -58,6 +59,9 @@ async function sendFallbackMessage(
       text: "Something went wrong while processing that message. I logged the error. Please try again or use /help.",
     });
   } catch (error) {
-    console.error("Could not send Telegram fallback message", error);
+    logRouteError("Could not send Telegram fallback message", {
+      error,
+      chatId,
+    });
   }
 }
