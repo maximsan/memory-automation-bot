@@ -18,4 +18,16 @@ describe("review formatting", () => {
       "Approve note only"
     ]);
   });
+
+  it("escapes dynamic review fields for MarkdownV2", () => {
+    const text = formatReviewMessage({
+      projectName: "super-dooper",
+      summary: "Deployed to Vercel. Next step: testing!",
+      proposedTask: "Check /api/health."
+    });
+
+    expect(text).toContain("*Project:* super\\-dooper");
+    expect(text).toContain("Deployed to Vercel\\. Next step: testing\\!");
+    expect(text).toContain("Check /api/health\\.");
+  });
 });

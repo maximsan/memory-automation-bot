@@ -72,11 +72,16 @@ export function reviewKeyboard(
 
 export function formatHelp(): string {
   return [
-    "Send me a note, sketchpad photo, or voice note.",
+    "Send me a project note, sketchpad photo, or voice note.",
+    "",
+    "To update project memory, send a normal message like:",
+    "cleanup-photos: deployed to Vercel, next step is testing.",
+    "",
+    "I will create a review card. Tapping Approve commits the update.",
     "",
     "Commands:",
     "/active - show pending reviews and next work",
-    "/project <name> - show one project state",
+    "/project <name> - show one project state only",
     "/addproject <name> - add a project",
     "/clean - remove temporary chat messages",
     "/help - show this",

@@ -1,4 +1,4 @@
-import { Client } from "@notionhq/client";
+import { APIErrorCode, APIResponseError, Client } from "@notionhq/client";
 import type { AppConfig } from "@/config";
 import type {
   CaptureJob,
@@ -20,6 +20,13 @@ type DatabaseIds = {
   tasks: string;
 };
 
+function isNotionObjectNotFound(error: unknown): boolean {
+  return (
+    APIResponseError.isAPIResponseError(error)
+    && error.code === APIErrorCode.ObjectNotFound
+  );
+}
+
 export function createNotionStore(config: AppConfig) {
   const notion = new Client({ auth: config.notionToken });
   let databaseIdsPromise: Promise<DatabaseIds> | undefined;
@@ -39,8 +46,12 @@ export function createNotionStore(config: AppConfig) {
         const page = await notion.pages.retrieve({ page_id: noteId });
 
         return pageToNote(page as any);
-      } catch {
-        return null;
+      } catch (error) {
+        if (isNotionObjectNotFound(error)) {
+          return null;
+        }
+
+        throw error;
       }
     },
 
