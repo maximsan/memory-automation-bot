@@ -40,9 +40,8 @@ export async function handleCommand(input: {
         projectInput.name,
         projectInput.aliases,
       );
-      const aliasLine =
-        projectInput.aliases.length ?
-          `\nAliases: ${projectInput.aliases.join(", ")}`
+      const aliasLine = projectInput.aliases.length
+        ? `\nAliases: ${projectInput.aliases.join(", ")}`
         : "";
 
       return { text: `Added project: ${project.name}${aliasLine}` };
@@ -103,17 +102,17 @@ export async function handleCommand(input: {
         escapeTelegramMarkdown(project.projectState || "No state yet."),
         "",
         "*Recent notes:*",
-        ...(notes.length ?
-          notes.map(
+        ...(notes.length
+          ? notes.map(
             (note) =>
               `\\- ${escapeTelegramMarkdown(note.cleanedSummary || "")}`,
           )
-        : ["\\- none"]),
+          : ["\\- none"]),
         "",
         "*Tasks:*",
-        ...(tasks.length ?
-          tasks.map((task) => `\\- ${escapeTelegramMarkdown(task.name)}`)
-        : ["\\- none"]),
+        ...(tasks.length
+          ? tasks.map((task) => `\\- ${escapeTelegramMarkdown(task.name)}`)
+          : ["\\- none"]),
       ];
 
       return { text: lines.join("\n"), markdown: true };

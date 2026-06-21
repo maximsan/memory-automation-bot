@@ -49,9 +49,9 @@ export default tseslint.config(
         { overrides: { "=": "none" } }
       ],
       "@stylistic/no-multi-spaces": "warn",
-      "brace-style": ["warn", "1tbs", { allowSingleLine: false }],
+      "@stylistic/brace-style": ["warn", "1tbs", { allowSingleLine: false }],
       curly: ["error", "all"],
-      "padding-line-between-statements": [
+      "@stylistic/padding-line-between-statements": [
         "warn",
         { blankLine: "always", prev: "*", next: "return" },
         { blankLine: "always", prev: "*", next: "throw" },

@@ -24,6 +24,7 @@ The first implementation is intentionally small:
 ```bash
 npm install
 npm run lint
+npm run lint:fix
 npm run typecheck
 npm test
 npm run build

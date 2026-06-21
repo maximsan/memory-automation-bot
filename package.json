@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint": "eslint .",
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
