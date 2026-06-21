@@ -9,16 +9,55 @@ import type { TelegramUpdate } from "@/core/telegram";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const config = loadConfig();
-  const update: unknown = await request.json();
+  let update: TelegramUpdate | undefined;
+  let config: ReturnType<typeof loadConfig> | undefined;
+  let telegram: ReturnType<typeof createTelegramClient> | undefined;
 
-  await handleTelegramWebhook(update as TelegramUpdate, {
-    config,
-    notion: createNotionStore(config),
-    telegram: createTelegramClient(config.telegramBotToken),
-    openai: createOpenAiClient(config),
-    prompts: await loadPrompts()
-  });
+  try {
+    update = (await request.json()) as TelegramUpdate;
+    config = loadConfig();
+    telegram = createTelegramClient(config.telegramBotToken);
+
+    await handleTelegramWebhook(update, {
+      config,
+      notion: createNotionStore(config),
+      telegram,
+      openai: createOpenAiClient(config),
+      prompts: await loadPrompts()
+    });
+  } catch (error) {
+    console.error("Telegram webhook failed", {
+      error,
+      updateId: update?.update_id,
+      chatId: chatIdFromUpdate(update)
+    });
+    await sendFallbackMessage(telegram, chatIdFromUpdate(update));
+  }
 
   return Response.json({ ok: true });
+}
+
+function chatIdFromUpdate(update?: TelegramUpdate): string | undefined {
+  const chatId = update?.message?.chat.id
+    ?? update?.callback_query?.message?.chat.id;
+
+  return chatId === undefined ? undefined : String(chatId);
+}
+
+async function sendFallbackMessage(
+  telegram: ReturnType<typeof createTelegramClient> | undefined,
+  chatId: string | undefined,
+): Promise<void> {
+  if (!telegram || !chatId) {
+    return;
+  }
+
+  try {
+    await telegram.sendMessage({
+      chatId,
+      text: "Something went wrong while processing that message. I logged the error. Please try again or use /help.",
+    });
+  } catch (error) {
+    console.error("Could not send Telegram fallback message", error);
+  }
 }

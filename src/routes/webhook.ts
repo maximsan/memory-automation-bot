@@ -45,13 +45,15 @@ export async function handleTelegramWebhook(
   }
 
   if (parsed.kind === "command") {
+    await sendTyping(parsed.chatId, deps);
+
     if (parsed.command === "clean") {
       await cleanRecentMessages(parsed.chatId, deps);
 
       return;
     }
 
-    const text = await handleCommand({
+    const response = await handleCommand({
       command: parsed.command,
       args: parsed.args,
       notion: deps.notion,
@@ -60,9 +62,9 @@ export async function handleTelegramWebhook(
 
     await deps.telegram.sendMessage({
       chatId: parsed.chatId,
-      text,
+      text: response.text,
       replyToMessageId: parsed.messageId,
-      markdown: text.includes("*"),
+      markdown: response.markdown,
     });
 
     return;
@@ -103,6 +105,7 @@ export async function handleTelegramWebhook(
   }
 
   if (parsed.kind === "capture") {
+    await sendTyping(parsed.job.chatId, deps);
     await handleCapture(parsed.job, deps);
   }
 }
@@ -148,20 +151,44 @@ async function handleCapture(
     return;
   }
 
-  // Durable state first, queue second. If queueing fails, the capture is still
-  // visible in Notion as Needs Review instead of being lost in Telegram only.
-  const note = await deps.notion.createNoteFromCapture(job);
   const review = await deps.telegram.sendMessage({
     chatId: job.chatId,
-    text: "Processing capture...",
+    text: "Got it. Saving this as a draft...",
     replyToMessageId: job.messageId,
   });
-  await deps.notion.setReviewMessageId(note.id, review.messageId);
-  await enqueueCapture({
-    ...job,
-    noteId: note.id,
-    reviewMessageId: review.messageId,
-  });
+
+  let note;
+
+  try {
+    // Durable state first, queue second. If queueing fails, the capture is still
+    // visible in Notion as Needs Review instead of being lost in Telegram only.
+    note = await deps.notion.createNoteFromCapture(job);
+    await deps.notion.setReviewMessageId(note.id, review.messageId);
+  } catch (error) {
+    await deps.telegram.editMessage({
+      chatId: job.chatId,
+      messageId: review.messageId,
+      text: "I could not save this to Notion. Please check the Notion setup and try again.",
+    });
+    console.error("Could not save Telegram capture to Notion", error);
+
+    return;
+  }
+
+  try {
+    await enqueueCapture({
+      ...job,
+      noteId: note.id,
+      reviewMessageId: review.messageId,
+    });
+  } catch (error) {
+    await deps.telegram.editMessage({
+      chatId: job.chatId,
+      messageId: review.messageId,
+      text: "Saved the draft in Notion, but processing did not start. Try again later.",
+    });
+    console.error("Could not enqueue Telegram capture for processing", error);
+  }
 }
 
 async function handleCallback(
@@ -291,4 +318,13 @@ async function cleanRecentMessages(
     chatId,
     text: `Cleaned ${deleted} recent temporary messages where Telegram allowed it.`,
   });
+}
+
+async function sendTyping(chatId: string, deps: WebhookDeps): Promise<void> {
+  try {
+    await deps.telegram.sendChatAction(chatId, "typing");
+  } catch {
+    // Typing indicators improve responsiveness but should never block the real
+    // reply path.
+  }
 }

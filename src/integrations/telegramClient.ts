@@ -4,6 +4,7 @@ export type TelegramClient = {
   sendMessage(input: SendMessageInput): Promise<{ messageId: string }>;
   editMessage(input: EditMessageInput): Promise<void>;
   answerCallbackQuery(callbackId: string, text?: string): Promise<void>;
+  sendChatAction(chatId: string, action: "typing"): Promise<void>;
   deleteMessage(chatId: string, messageId: string): Promise<void>;
   getFileDownloadUrl(fileId: string): Promise<string>;
 };
@@ -82,6 +83,13 @@ export function createTelegramClient(botToken: string): TelegramClient {
       await callTelegram("answerCallbackQuery", {
         callback_query_id: callbackId,
         text,
+      });
+    },
+
+    async sendChatAction(chatId, action) {
+      await callTelegram("sendChatAction", {
+        chat_id: chatId,
+        action,
       });
     },
 
