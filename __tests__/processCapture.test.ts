@@ -65,4 +65,37 @@ describe("processCaptureJob", () => {
       })
     );
   });
+
+  it("rethrows Notion note lookup failures so the queue can retry", async () => {
+    const editMessage = vi.fn().mockResolvedValue(undefined);
+
+    await expect(processCaptureJob(
+      {
+        noteId: "note-1",
+        chatId: "42",
+        messageId: "10",
+        reviewMessageId: "20",
+        sourceType: "text",
+        text: "fixed ci"
+      },
+      {
+        notion: {
+          getNote: vi.fn().mockRejectedValue(new Error("notion down")),
+          listActiveProjects: vi.fn(),
+          updateNoteExtraction: vi.fn(),
+          trashNote: vi.fn()
+        },
+        telegram: {
+          getFileDownloadUrl: vi.fn(),
+          editMessage
+        },
+        openai: {
+          extract: vi.fn()
+        },
+        prompts: { extractNote: "prompt" }
+      }
+    )).rejects.toThrow("Notion operation failed");
+
+    expect(editMessage).not.toHaveBeenCalled();
+  });
 });
