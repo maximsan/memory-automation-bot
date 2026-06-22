@@ -28,8 +28,12 @@ npm run lint:fix
 npm run typecheck
 npm test
 npm run build
+npm run setup:notion
+npm run setup:telegram
 ```
 
 ## Setup
 
 Use [Project onboarding lesson](lessons/0001-project-onboarding.html) for the full Telegram, Notion, OpenAI, Vercel, GitHub, and webhook setup path.
+
+After setting `TELEGRAM_BOT_TOKEN`, run `npm run setup:telegram` to register the native Telegram command menu. Run it again whenever the visible command list changes.

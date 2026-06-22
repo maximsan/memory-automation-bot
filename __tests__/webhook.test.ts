@@ -30,6 +30,8 @@ function createTelegram() {
     sendChatAction,
     deleteMessage: vi.fn().mockResolvedValue(undefined),
     getFileDownloadUrl: vi.fn().mockResolvedValue("https://example.com/file"),
+    setMyCommands: vi.fn().mockResolvedValue(undefined),
+    setChatMenuButton: vi.fn().mockResolvedValue(undefined),
   };
 
   return { telegram, sendMessage, editMessage, sendChatAction };

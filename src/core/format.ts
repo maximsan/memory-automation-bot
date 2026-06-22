@@ -1,3 +1,4 @@
+import { helpCommandLines } from "./commandDefinitions";
 import type { TelegramKeyboard } from "./types";
 
 /**
@@ -80,11 +81,7 @@ export function formatHelp(): string {
     "I will create a review card. Tapping Approve commits the update.",
     "",
     "Commands:",
-    "/active - show pending reviews and next work",
-    "/project <name> - show one project state only",
-    "/addproject <name> [| alias, alias] - add a project",
-    "/clean - remove temporary chat messages",
-    "/help - show this",
+    ...helpCommandLines(),
   ].join("\n");
 }
 

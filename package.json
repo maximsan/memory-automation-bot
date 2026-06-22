@@ -11,7 +11,8 @@
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "setup:notion": "tsx scripts/setup-notion.ts"
+    "setup:notion": "tsx scripts/setup-notion.ts",
+    "setup:telegram": "tsx scripts/setup-telegram.ts"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",

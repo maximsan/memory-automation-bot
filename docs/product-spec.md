@@ -34,6 +34,8 @@ Commands:
 - `/clean` deletes temporary Telegram messages where Telegram still allows it.
 - `/help` shows a short command list.
 
+The same commands are registered in Telegram's native command menu.
+
 Review message without a task:
 
 ```text
