@@ -1,6 +1,7 @@
 import { loadConfig } from "@/config";
 import { allowsLocalForceRun } from "@/core/cron";
 import { formatActive } from "@/core/format";
+import { logWeeklyCronError } from "@/core/logging";
 import { createNotionStore } from "@/integrations/notionStore";
 import { createTelegramClient } from "@/integrations/telegramClient";
 
@@ -20,18 +21,31 @@ export async function GET(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const notion = createNotionStore(config);
-  const counts = await notion.activeCounts();
-  const telegram = createTelegramClient(config.telegramBotToken);
-  const [chatId] = config.allowedTelegramUserIds;
+  try {
+    const notion = createNotionStore(config);
+    const counts = await notion.activeCounts();
+    const telegram = createTelegramClient(config.telegramBotToken);
+    const [chatId] = config.allowedTelegramUserIds;
 
-  await telegram.sendMessage({
-    chatId,
-    text: ["*Weekly check\\-in:*", formatActive(counts), "", "Use /active"].join(
-      "\n",
-    ),
-    markdown: true,
-  });
+    await telegram.sendMessage({
+      chatId,
+      text: [
+        "*Weekly check\\-in:*",
+        formatActive(counts),
+        "",
+        "Use /active",
+      ].join("\n"),
+      markdown: true,
+    });
+  } catch (error) {
+    logWeeklyCronError({
+      error,
+      force,
+      recipientCount: config.allowedTelegramUserIds.length,
+    });
+
+    return new Response("Internal Server Error", { status: 500 });
+  }
 
   return Response.json({ ok: true });
 }

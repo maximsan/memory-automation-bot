@@ -4,6 +4,10 @@ import { createOpenAiClient } from "@/integrations/openaiClient";
 import { loadPrompts } from "@/integrations/prompts";
 import { createTelegramClient } from "@/integrations/telegramClient";
 import { handleTelegramWebhook } from "@/routes/webhook";
+import {
+  logTelegramFallbackError,
+  logTelegramWebhookError,
+} from "@/core/logging";
 import type { TelegramUpdate } from "@/core/telegram";
 
 export const runtime = "nodejs";
@@ -23,14 +27,15 @@ export async function POST(request: Request) {
       notion: createNotionStore(config),
       telegram,
       openai: createOpenAiClient(config),
-      prompts: await loadPrompts()
+      prompts: await loadPrompts(),
     });
   } catch (error) {
-    console.error("Telegram webhook failed", {
+    logTelegramWebhookError({
       error,
       updateId: update?.update_id,
-      chatId: chatIdFromUpdate(update)
+      chatId: chatIdFromUpdate(update),
     });
+
     await sendFallbackMessage(telegram, chatIdFromUpdate(update));
   }
 
@@ -38,8 +43,8 @@ export async function POST(request: Request) {
 }
 
 function chatIdFromUpdate(update?: TelegramUpdate): string | undefined {
-  const chatId = update?.message?.chat.id
-    ?? update?.callback_query?.message?.chat.id;
+  const chatId =
+    update?.message?.chat.id ?? update?.callback_query?.message?.chat.id;
 
   return chatId === undefined ? undefined : String(chatId);
 }
@@ -58,6 +63,9 @@ async function sendFallbackMessage(
       text: "Something went wrong while processing that message. I logged the error. Please try again or use /help.",
     });
   } catch (error) {
-    console.error("Could not send Telegram fallback message", error);
+    logTelegramFallbackError({
+      error,
+      chatId,
+    });
   }
 }

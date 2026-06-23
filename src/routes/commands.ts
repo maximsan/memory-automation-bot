@@ -96,7 +96,7 @@ export async function handleCommand(input: {
       ]);
 
       const lines = [
-        `*${escapeTelegramMarkdown(project.name)}*`,
+        `*Project:* ${escapeTelegramMarkdown(project.name)}`,
         "",
         "*State:*",
         escapeTelegramMarkdown(project.projectState || "No state yet."),
