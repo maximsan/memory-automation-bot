@@ -6,6 +6,8 @@ import { createNotionStore } from "@/integrations/notionStore";
 
 const notionMock = vi.hoisted(() => ({
   retrieve: vi.fn(),
+  create: vi.fn(),
+  listChildren: vi.fn(),
 }));
 
 vi.mock("@notionhq/client", async (importActual) => {
@@ -14,7 +16,11 @@ vi.mock("@notionhq/client", async (importActual) => {
   return {
     ...actual,
     Client: vi.fn(() => ({
-      pages: { retrieve: notionMock.retrieve },
+      pages: {
+        retrieve: notionMock.retrieve,
+        create: notionMock.create,
+      },
+      blocks: { children: { list: notionMock.listChildren } },
     })),
   };
 });
@@ -50,6 +56,8 @@ function apiResponseError(code: APIErrorCode): APIResponseError {
 describe("createNotionStore", () => {
   beforeEach(() => {
     notionMock.retrieve.mockReset();
+    notionMock.create.mockReset();
+    notionMock.listChildren.mockReset();
   });
 
   describe("getNote", () => {
@@ -71,6 +79,47 @@ describe("createNotionStore", () => {
       await expect(
         createNotionStore(config).getNote("note-1"),
       ).rejects.toThrow(error);
+    });
+  });
+
+  describe("createProject", () => {
+    it("stores aliases as comma-separated rich text", async () => {
+      notionMock.listChildren.mockResolvedValue({
+        results: [
+          { type: "child_database", id: "projects-db", child_database: { title: "Projects" } },
+          { type: "child_database", id: "notes-db", child_database: { title: "Notes" } },
+          { type: "child_database", id: "tasks-db", child_database: { title: "Tasks" } },
+        ],
+      });
+      notionMock.create.mockResolvedValue({
+        id: "project-1",
+        url: "https://notion.so/project-1",
+        properties: {
+          Name: { title: [{ plain_text: "n8n-automation" }] },
+          Aliases: {
+            rich_text: [{ plain_text: "project memory bot, memory bot" }],
+          },
+          Status: { select: { name: "Active" } },
+          "Project State": { rich_text: [] },
+        },
+      });
+
+      const project = await createNotionStore(config).createProject(
+        "n8n-automation",
+        ["project memory bot", "memory bot"],
+      );
+
+      expect(notionMock.create.mock.calls[0]?.[0]).toMatchObject({
+        parent: { database_id: "projects-db" },
+        properties: {
+          Aliases: {
+            rich_text: [
+              { text: { content: "project memory bot, memory bot" } },
+            ],
+          },
+        },
+      });
+      expect(project.aliases).toEqual(["project memory bot", "memory bot"]);
     });
   });
 });

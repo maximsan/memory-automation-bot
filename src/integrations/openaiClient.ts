@@ -34,7 +34,7 @@ export function createOpenAiClient(config: AppConfig): OpenAiClient {
       const content = [
         `${input.prompt}`,
         "",
-        `Known projects: ${input.knownProjects.map((project) => project.name).join(", ") || "none"}`,
+        `Known projects: ${formatKnownProjects(input.knownProjects)}`,
         input.job.userHint
           ? `User hint: ${input.job.userHint}`
           : "User hint: none",
@@ -86,6 +86,22 @@ export function createOpenAiClient(config: AppConfig): OpenAiClient {
       return completion.choices[0]?.message.content?.trim() || input.newSummary;
     },
   };
+}
+
+export function formatKnownProjects(projects: ProjectRecord[]): string {
+  if (projects.length === 0) {
+    return "none";
+  }
+
+  return projects
+    .map((project) => {
+      if (project.aliases.length === 0) {
+        return project.name;
+      }
+
+      return `${project.name} (aliases: ${project.aliases.join(", ")})`;
+    })
+    .join(", ");
 }
 
 async function getCaptureText(

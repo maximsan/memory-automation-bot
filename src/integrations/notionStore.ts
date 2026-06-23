@@ -208,14 +208,17 @@ export function createNotionStore(config: AppConfig) {
       return result.results.map((page) => pageToProject(page as any));
     },
 
-    async createProject(name: string): Promise<ProjectRecord> {
+    async createProject(
+      name: string,
+      aliases: string[] = [],
+    ): Promise<ProjectRecord> {
       const ids = await databaseIds();
       const page = await notion.pages.create({
         parent: { database_id: ids.projects },
         properties: {
           Name: titleProperty(name),
           Status: selectProperty("Active"),
-          Aliases: richTextProperty(""),
+          Aliases: richTextProperty(aliases.join(", ")),
           "Project State": richTextProperty(""),
           "Last Updated": dateProperty(new Date()),
         },

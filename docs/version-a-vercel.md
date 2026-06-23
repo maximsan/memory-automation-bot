@@ -74,6 +74,12 @@ The Notion setup script is conservative:
 - stops on schema conflicts
 - does not mutate incompatible existing schema automatically
 
+The Telegram setup script registers the native command menu from the same command definitions used by `/help`:
+
+```bash
+npm run setup:telegram
+```
+
 ## Deployment Model
 
 GitHub Actions runs checks only. Vercel Git integration owns preview and production deployment. The operational flow lives in [Checks and Deployment](ci-cd.md) and the onboarding lesson.

@@ -7,6 +7,17 @@ export type TelegramClient = {
   sendChatAction(chatId: string, action: "typing"): Promise<void>;
   deleteMessage(chatId: string, messageId: string): Promise<void>;
   getFileDownloadUrl(fileId: string): Promise<string>;
+  setMyCommands(commands: TelegramBotCommand[]): Promise<void>;
+  setChatMenuButton(menuButton: TelegramMenuButton): Promise<void>;
+};
+
+export type TelegramBotCommand = {
+  command: string;
+  description: string;
+};
+
+export type TelegramMenuButton = {
+  type: "commands";
 };
 
 export type SendMessageInput = {
@@ -106,6 +117,18 @@ export function createTelegramClient(botToken: string): TelegramClient {
       });
 
       return `https://api.telegram.org/file/bot${botToken}/${result.file_path}`;
+    },
+
+    async setMyCommands(commands) {
+      await callTelegram<boolean>("setMyCommands", {
+        commands,
+      });
+    },
+
+    async setChatMenuButton(menuButton) {
+      await callTelegram<boolean>("setChatMenuButton", {
+        menu_button: menuButton,
+      });
     },
   };
 }
